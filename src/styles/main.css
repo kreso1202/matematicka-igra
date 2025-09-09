@@ -278,15 +278,15 @@ p {
   color: #d1d5db;
 }
 
-/* Feedback messages - SMALLER VERSION */
+/* Feedback messages - MUCH SMALLER VERSION */
 .feedback-correct {
   background: linear-gradient(45deg, #10b981, #059669);
   color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -295,22 +295,22 @@ p {
 .feedback-wrong {
   background: linear-gradient(45deg, #ef4444, #dc2626);
   color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
   text-align: center;
 }
 
 .feedback-timeout {
   background: linear-gradient(45deg, #f59e0b, #d97706);
   color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
   text-align: center;
 }
 
