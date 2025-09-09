@@ -126,21 +126,21 @@ function App() {
         setSessionStats(prev => ({ ...prev, correct: prev.correct + 1 }));
         setShowFeedback(FEEDBACK_TYPES.CORRECT);
         
-        if (GameLogic.shouldLevelUp(questionsInLevel + 1, currentLevel)) {
-            setTimeout(() => {
-                setAnswer('');
-                setShowFeedback('');
+        setTimeout(() => {
+            setAnswer('');
+            setShowFeedback('');
+            
+            if (GameLogic.shouldLevelUp(questionsInLevel + 1, currentLevel)) {
                 if (!GameLogic.isGameComplete(currentLevel)) {
                     setGameState(GAME_STATES.LEVEL_COMPLETE);
                 } else {
                     endGame();
                 }
-            }, 1000);
-        } else {
-            setTimeout(() => {
-                continueGame();
-            }, 1500);
-        }
+            } else {
+                generateQuestion();
+                GameLogic.focusInput(100);
+            }
+        }, 2000);
     };
 
     const handleWrongAnswer = () => {
@@ -150,13 +150,15 @@ function App() {
         setShowFeedback(FEEDBACK_TYPES.WRONG);
         
         setTimeout(() => {
+            setAnswer('');
             setShowFeedback('');
             if (lives - 1 <= 0) {
                 endGame();
             } else {
-                continueGame();
+                generateQuestion();
+                GameLogic.focusInput(100);
             }
-        }, 1500);
+        }, 2000);
     };
 
     const handleTimeout = () => {
@@ -166,19 +168,15 @@ function App() {
         setShowFeedback(FEEDBACK_TYPES.TIMEOUT);
         
         setTimeout(() => {
+            setAnswer('');
             setShowFeedback('');
             if (lives - 1 <= 0) {
                 endGame();
             } else {
-                continueGame();
+                generateQuestion();
+                GameLogic.focusInput(100);
             }
-        }, 1500);
-    };
-
-    const continueGame = () => {
-        setAnswer('');
-        generateQuestion();
-        GameLogic.focusInput();
+        }, 2000);
     };
 
     const endGame = async () => {
