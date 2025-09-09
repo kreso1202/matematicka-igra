@@ -1,47 +1,49 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';  
-@import 'tailwindcss/utilities';
-
-@layer base {
-  body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer components {
-  .game-container {
-    @apply min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-yellow-400 flex items-center justify-center p-4;
-  }
-  
-  .game-card {
-    @apply bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md;
-  }
-  
-  .button-primary {
-    @apply w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl text-xl hover:scale-105 transform transition-all duration-200;
-  }
-  
-  .button-secondary {
-    @apply w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-xl text-lg hover:scale-105 transform transition-all duration-200;
-  }
-  
-  .feedback-correct {
-    @apply bg-green-100 text-green-800 p-4 rounded-xl font-bold text-lg relative overflow-hidden;
-  }
-  
-  .feedback-wrong {
-    @apply bg-red-100 text-red-800 p-4 rounded-xl font-bold text-lg;
-  }
-  
-  .feedback-timeout {
-    @apply bg-orange-100 text-orange-800 p-4 rounded-xl font-bold text-lg;
-  }
-  
-  .level-progress {
-    @apply bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-700 ease-out;
-  }
-  
-  .input-answer {
-    @apply w-full text-2xl text-center p-4 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.game-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.game-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.button-primary {
+  width: 100%;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.button-primary:hover {
+  transform: scale(1.05);
+}
+
+.button-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
