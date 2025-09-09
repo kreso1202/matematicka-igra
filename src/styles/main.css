@@ -97,6 +97,36 @@ body {
   transform: scale(1.05);
 }
 
+/* Leaderboard export button */
+.w-full.bg-green-500 {
+  width: 100%;
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.w-full.bg-green-500:hover:not(:disabled) {
+  transform: scale(1.05);
+  background: #16a34a;
+}
+
+.w-full.bg-green-500:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Input fields */
 input[type="text"], input[type="number"] {
   width: 100%;
@@ -164,10 +194,12 @@ p {
 .text-blue-800 { color: #1e40af; }
 .text-green-700 { color: #15803d; }
 .text-green-800 { color: #166534; }
+.text-green-600 { color: #16a34a; }
 .text-yellow-700 { color: #a16207; }
 .text-yellow-800 { color: #92400e; }
 .text-red-500 { color: #ef4444; }
 .text-orange-800 { color: #9a3412; }
+.text-orange-700 { color: #c2410c; }
 .text-gray-600 { color: #4b5563; }
 .text-gray-500 { color: #6b7280; }
 
@@ -211,6 +243,7 @@ p {
 .h-5 { height: 1.25rem; }
 
 /* Font sizes */
+.text-xs { font-size: 0.75rem; }
 .text-sm { font-size: 0.875rem; }
 .text-lg { font-size: 1.125rem; }
 .text-xl { font-size: 1.25rem; }
@@ -245,14 +278,14 @@ p {
   color: #d1d5db;
 }
 
-/* Feedback messages */
+/* Feedback messages - SMALLER VERSION */
 .feedback-correct {
   background: linear-gradient(45deg, #10b981, #059669);
   color: white;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-bottom: 1rem;
   text-align: center;
   position: relative;
@@ -262,10 +295,10 @@ p {
 .feedback-wrong {
   background: linear-gradient(45deg, #ef4444, #dc2626);
   color: white;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -273,10 +306,10 @@ p {
 .feedback-timeout {
   background: linear-gradient(45deg, #f59e0b, #d97706);
   color: white;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -334,7 +367,15 @@ p {
 .max-h-96 { max-height: 24rem; }
 .overflow-y-auto { overflow-y: auto; }
 
-/* Cloud status */
+/* Cloud status - SMALLER VERSION */
+.bg-gray-50.rounded-lg {
+  background-color: #f9fafb;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
 .bg-yellow-50 {
   background-color: #fefce8;
   border: 1px solid #fde047;
@@ -345,6 +386,34 @@ p {
 
 .text-yellow-800 {
   color: #92400e;
+}
+
+/* Refresh button styling */
+.text-blue-500:hover {
+  color: #1d4ed8;
+}
+
+button.text-blue-500 {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+button.text-blue-500:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Streak indicator */
+.bg-orange-100 {
+  background-color: #fed7aa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
 /* Responsive */
@@ -360,5 +429,9 @@ p {
   
   .input-answer {
     font-size: 1.5rem;
+  }
+  
+  .button-primary {
+    font-size: 1.125rem;
   }
 }
