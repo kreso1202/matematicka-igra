@@ -31,16 +31,14 @@ function GameScreen({
         return (
             <div className={`mb-4 ${feedbackClasses[showFeedback]}`}>
                 {showFeedback === FEEDBACK_TYPES.CORRECT && (
-                    <>
-                        <div className="text-4xl mb-2 animate-bounce">🎉</div>
-                        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                            <div className="absolute top-2 left-4 text-yellow-400 animate-ping text-2xl">⭐</div>
-                            <div className="absolute top-3 right-6 text-yellow-400 animate-ping text-xl" style={{animationDelay: '0.1s'}}>✨</div>
-                            <div className="absolute top-1 left-1/2 text-yellow-400 animate-ping text-lg" style={{animationDelay: '0.2s'}}>💫</div>
-                            <div className="absolute top-4 right-4 text-yellow-400 animate-ping text-xl" style={{animationDelay: '0.3s'}}>🌟</div>
+                    <div className="flex items-center justify-center gap-3">
+                        <div className="animate-ping text-yellow-400 text-xl">⭐</div>
+                        <div className="flex flex-col items-center">
+                            <div className="text-3xl animate-bounce mb-1">🎉</div>
+                            <div className="font-bold">Odlično!</div>
                         </div>
-                        Odlično!
-                    </>
+                        <div className="animate-ping text-yellow-400 text-xl">⭐</div>
+                    </div>
                 )}
                 {showFeedback === FEEDBACK_TYPES.WRONG && `❌ Odgovor je ${correctAnswer}`}
                 {showFeedback === FEEDBACK_TYPES.TIMEOUT && '⏰ Vrijeme je isteklo!'}
