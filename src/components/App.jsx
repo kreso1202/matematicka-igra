@@ -203,7 +203,26 @@ function App() {
     const getTopPlayers = () => PlayerManager.getTopPlayers(localData, cloudData, isJsonBinConfigured());
     const getLevelProgress = () => GameLogic.getLevelProgress(questionsInLevel, currentLevel);
     const exportResults = () => LocalStorage.exportData();
-    const refreshCloudData = async () => await loadFromCloud();
+
+    // FIXED: Proper refresh function
+    const refreshCloudData = async () => {
+        if (!isJsonBinConfigured()) return;
+        
+        setIsLoading(true);
+        try {
+            const freshData = await CloudStorage.loadFromCloud();
+            // Force update with fresh timestamp
+            setCloudData({
+                ...freshData,
+                lastUpdate: freshData.lastUpdate || new Date().toISOString()
+            });
+            setIsOnline(true);
+        } catch (error) {
+            setIsOnline(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Effects
     useEffect(() => {
