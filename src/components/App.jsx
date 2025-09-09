@@ -9,7 +9,7 @@ import LevelCompleteScreen from './screens/LevelCompleteScreen.jsx';
 import GameOverScreen from './screens/GameOverScreen.jsx';
 import LeaderboardScreen from './screens/LeaderboardScreen.jsx';
 import CloudStatus from './common/CloudStatus.jsx';
-import { Cloud } from './Icons';
+import { Cloud } from './Icons.jsx';
 
 function App() {
     // Game state
