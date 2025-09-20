@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { GAME_STATES, FEEDBACK_TYPES, GAME_MODES } from '../services/gameConfig.js';
 import { CloudStorage, LocalStorage } from '../services/cloudStorage.js';
 import { GameLogic, PlayerManager } from '../services/gameLogic.js';
+import { AchievementManager } from '../services/achievementManager.js';
+import { ThemeManager } from '../services/themeManager.js';
 import WelcomeScreen from './screens/WelcomeScreen.jsx';
 import MenuScreen from './screens/MenuScreen.jsx';
 import GameModesScreen from './screens/GameModesScreen.jsx';
@@ -9,6 +11,9 @@ import GameScreen from './screens/GameScreen.jsx';
 import LevelCompleteScreen from './screens/LevelCompleteScreen.jsx';
 import GameOverScreen from './screens/GameOverScreen.jsx';
 import LeaderboardScreen from './screens/LeaderboardScreen.jsx';
+import StatisticsScreen from './screens/StatisticsScreen.jsx';
+import AchievementsScreen from './screens/AchievementsScreen.jsx';
+import SettingsScreen from './screens/SettingsScreen.jsx';
 import CloudStatus from './common/CloudStatus.jsx';
 import { Cloud } from './Icons.jsx';
 
@@ -32,6 +37,11 @@ function App() {
     const [questionsInLevel, setQuestionsInLevel] = useState(0);
     const [streak, setStreak] = useState(0);
     const [sessionStats, setSessionStats] = useState({ correct: 0, wrong: 0, timeouts: 0 });
+    
+    // Nova stanja za achievements i tracking
+    const [gameStartTime, setGameStartTime] = useState(null);
+    const [maxStreak, setMaxStreak] = useState(0);
+    const [newAchievements, setNewAchievements] = useState([]);
     
     // UI state
     const [isOnline, setIsOnline] = useState(true);
@@ -90,9 +100,11 @@ function App() {
         setCurrentLevel(1);
         setQuestionsInLevel(0);
         setStreak(0);
+        setMaxStreak(0);
         setAnswer('');
         setShowFeedback('');
         setSessionStats({ correct: 0, wrong: 0, timeouts: 0 });
+        setGameStartTime(Date.now());
         generateQuestion();
         GameLogic.focusInput(300);
     };
@@ -104,6 +116,13 @@ function App() {
         setQuestionsInLevel(0);
         setLives(gameMode === GAME_MODES.TRAINING ? 999 : 3);
         setGameState(GAME_STATES.PLAYING);
+        
+        // Zvuk za novi nivo
+        const allPlayers = getAllPlayers();
+        const playerData = allPlayers[playerName];
+        const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+        ThemeManager.playSound('levelUp', soundEnabled);
+        
         setTimeout(() => {
             generateQuestion();
             GameLogic.focusInput(200);
@@ -125,9 +144,16 @@ function App() {
         
         setScore(score + points);
         setStreak(streak + 1);
+        setMaxStreak(Math.max(maxStreak, streak + 1));
         setQuestionsInLevel(questionsInLevel + 1);
         setSessionStats(prev => ({ ...prev, correct: prev.correct + 1 }));
         setShowFeedback(FEEDBACK_TYPES.CORRECT);
+        
+        // Zvuk za točan odgovor
+        const allPlayers = getAllPlayers();
+        const playerData = allPlayers[playerName];
+        const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+        ThemeManager.playSound('correct', soundEnabled);
         
         setTimeout(() => {
             setAnswer('');
@@ -147,6 +173,12 @@ function App() {
     };
 
     const handleWrongAnswer = () => {
+        // Zvuk za netočan odgovor
+        const allPlayers = getAllPlayers();
+        const playerData = allPlayers[playerName];
+        const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+        ThemeManager.playSound('wrong', soundEnabled);
+        
         if (gameMode === GAME_MODES.TRAINING) {
             // In training mode, just show feedback and continue
             setShowFeedback(FEEDBACK_TYPES.WRONG);
@@ -200,6 +232,9 @@ function App() {
     };
 
     const endGame = async () => {
+        const gameTime = Math.floor((Date.now() - gameStartTime) / 1000);
+        const sessionStatsWithStreak = { ...sessionStats, maxStreak };
+        
         setGameState(GAME_STATES.GAME_OVER);
         
         const allPlayers = PlayerManager.getAllPlayers(localData, cloudData, isJsonBinConfigured());
@@ -208,14 +243,82 @@ function App() {
             playerName, 
             score, 
             currentLevel, 
-            sessionStats
+            sessionStatsWithStreak,
+            gameTime
         );
+
+        // Provjeri achievements
+        const playerData = updatedPlayerData[playerName];
+        const achievementResult = AchievementManager.checkAchievements(
+            playerData, 
+            sessionStatsWithStreak, 
+            gameTime, 
+            maxStreak
+        );
+        
+        // Ažuriraj achievements ako ima novih
+        if (achievementResult.newUnlocked.length > 0) {
+            setNewAchievements(achievementResult.newUnlocked);
+            updatedPlayerData[playerName].statistics.achievements = {
+                unlocked: achievementResult.unlocked,
+                progress: achievementResult.progress
+            };
+            
+            // Zvuk za postignuće
+            const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+            setTimeout(() => {
+                ThemeManager.playSound('achievement', soundEnabled);
+            }, 1000);
+        }
 
         setLocalData(updatedPlayerData);
         LocalStorage.save(updatedPlayerData);
 
         if (isJsonBinConfigured()) {
             await saveToCloud(updatedPlayerData);
+        }
+    };
+
+    const updatePlayerPreferences = (playerName, preferences) => {
+        const allPlayers = getAllPlayers();
+        const currentPlayerData = allPlayers[playerName] || {
+            name: playerName,
+            bestScore: 0,
+            maxLevel: 1,
+            gamesPlayed: 0,
+            results: [],
+            statistics: {
+                totalTimeSpent: 0,
+                totalQuestionsAnswered: 0,
+                totalCorrectAnswers: 0,
+                bestStreak: 0,
+                averageAccuracy: 0,
+                levelStats: {},
+                dailyStats: {},
+                achievements: { unlocked: [], progress: {} },
+                preferences: {}
+            }
+        };
+        
+        const updatedPlayerData = {
+            ...allPlayers,
+            [playerName]: {
+                ...currentPlayerData,
+                statistics: {
+                    ...currentPlayerData.statistics,
+                    preferences: {
+                        ...currentPlayerData.statistics.preferences,
+                        ...preferences
+                    }
+                }
+            }
+        };
+        
+        setLocalData(updatedPlayerData);
+        LocalStorage.save(updatedPlayerData);
+        
+        if (isJsonBinConfigured()) {
+            saveToCloud(updatedPlayerData);
         }
     };
 
@@ -266,6 +369,16 @@ function App() {
         }
     }, [currentQuestion, questionsInLevel, currentLevel, gameState]);
 
+    // Učitaj temu na početak ili kad se promijeni igrač
+    useEffect(() => {
+        if (playerName) {
+            const allPlayers = getAllPlayers();
+            const playerData = allPlayers[playerName];
+            const theme = playerData?.statistics?.preferences?.theme || 'default';
+            ThemeManager.applyTheme(theme);
+        }
+    }, [playerName, localData]);
+
     const commonProps = {
         playerName,
         setPlayerName,
@@ -283,7 +396,10 @@ function App() {
         score,
         sessionStats,
         streak,
-        gameMode
+        gameMode,
+        updatePlayerPreferences,
+        newAchievements,
+        setNewAchievements
     };
 
     const gameProps = {
@@ -301,7 +417,10 @@ function App() {
     };
 
     return (
-        <div className="game-container">
+        <div className="game-container min-h-screen transition-colors duration-300" style={{
+            background: 'var(--bg-primary, #ffffff)',
+            color: 'var(--text-primary, #1f2937)'
+        }}>
             <div className="game-card">
                 {isJsonBinConfigured() && (
                     <CloudStatus 
@@ -311,8 +430,12 @@ function App() {
                 )}
 
                 {!isJsonBinConfigured() && (
-                    <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
-                        <div className="flex items-center gap-2 text-yellow-800">
+                    <div className="mb-4 p-3 border rounded-lg text-sm" style={{
+                        backgroundColor: 'var(--bg-secondary, #f8fafc)',
+                        borderColor: 'var(--border-color, #d1d5db)',
+                        color: 'var(--text-secondary, #6b7280)'
+                    }}>
+                        <div className="flex items-center gap-2">
                             <Cloud size={16} />
                             <span>Lokalni način - podaci se spremaju samo na ovom uređaju</span>
                         </div>
@@ -326,6 +449,9 @@ function App() {
                 {gameState === GAME_STATES.LEVEL_COMPLETE && <LevelCompleteScreen {...commonProps} />}
                 {gameState === GAME_STATES.GAME_OVER && <GameOverScreen {...commonProps} />}
                 {gameState === GAME_STATES.LEADERBOARD && <LeaderboardScreen {...commonProps} />}
+                {gameState === GAME_STATES.STATISTICS && <StatisticsScreen {...commonProps} />}
+                {gameState === GAME_STATES.ACHIEVEMENTS && <AchievementsScreen {...commonProps} />}
+                {gameState === GAME_STATES.SETTINGS && <SettingsScreen {...commonProps} />}
             </div>
         </div>
     );
