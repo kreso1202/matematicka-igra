@@ -1,3 +1,4 @@
+import GameModesScreen from './screens/GameModesScreen.jsx';
 import { useState, useEffect } from 'react';
 import { GAME_STATES, FEEDBACK_TYPES } from '../services/gameConfig.js';
 import { CloudStorage, LocalStorage } from '../services/cloudStorage.js';
