@@ -24,14 +24,268 @@ function AchievementsScreen({ playerName, getAllPlayers, setGameState, newAchiev
         }
     }, [newAchievements, setNewAchievements]);
 
+    // Inline stilovi
+    const containerStyle = {
+        maxWidth: '1024px',
+        margin: '0 auto',
+        padding: '1.5rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    };
+
+    const headerStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '1.5rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
+    };
+
+    const titleStyle = {
+        fontSize: '1.875rem',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        margin: 0
+    };
+
+    const subtitleStyle = {
+        color: '#6b7280',
+        margin: '0.25rem 0 0 0'
+    };
+
+    const backButtonStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        backgroundColor: '#6b7280',
+        color: 'white',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        transition: 'background-color 0.2s ease'
+    };
+
+    const progressSummaryStyle = {
+        background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)',
+        padding: '1.5rem',
+        borderRadius: '0.75rem',
+        border: '1px solid #3b82f6',
+        marginBottom: '1rem'
+    };
+
+    const progressHeaderStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '1rem'
+    };
+
+    const progressCountStyle = {
+        fontSize: '1.875rem',
+        fontWeight: 'bold',
+        color: '#1d4ed8',
+        margin: 0
+    };
+
+    const progressLabelStyle = {
+        fontSize: '0.875rem',
+        color: '#1e40af',
+        fontWeight: '500'
+    };
+
+    const progressPercentStyle = {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        color: '#4338ca',
+        margin: 0
+    };
+
+    const progressBarContainerStyle = {
+        width: '100%',
+        backgroundColor: '#bfdbfe',
+        borderRadius: '0.5rem',
+        height: '0.75rem',
+        overflow: 'hidden'
+    };
+
+    const progressBarFillStyle = (percentage) => ({
+        background: 'linear-gradient(to right, #3b82f6, #4338ca)',
+        height: '100%',
+        borderRadius: 'inherit',
+        width: `${percentage}%`,
+        transition: 'width 0.5s ease'
+    });
+
+    const achievementsGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '1rem'
+    };
+
+    const achievementCardStyle = (isUnlocked, isNew) => ({
+        padding: '1.5rem',
+        borderRadius: '0.75rem',
+        border: isNew ? '4px solid #f59e0b' : '1px solid #e5e7eb',
+        background: isUnlocked 
+            ? 'linear-gradient(135deg, #d1fae5, #a7f3d0)' 
+            : 'linear-gradient(135deg, #f9fafb, #f3f4f6)',
+        opacity: isUnlocked ? 1 : 0.75,
+        transition: 'all 0.3s ease',
+        transform: isNew ? 'scale(1.02)' : 'scale(1)',
+        boxShadow: isUnlocked 
+            ? '0 4px 15px rgba(34, 197, 94, 0.2)' 
+            : '0 2px 8px rgba(0, 0, 0, 0.1)',
+        cursor: 'default'
+    });
+
+    const achievementContentStyle = {
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '1rem'
+    };
+
+    const achievementEmojiStyle = (isUnlocked) => ({
+        fontSize: '2.5rem',
+        transition: 'all 0.3s ease',
+        transform: isUnlocked ? 'scale(1.1)' : 'scale(1)',
+        filter: isUnlocked ? 'none' : 'grayscale(100%) opacity(50%)'
+    });
+
+    const achievementInfoStyle = {
+        flex: 1
+    };
+
+    const achievementNameStyle = (isUnlocked) => ({
+        fontSize: '1.125rem',
+        fontWeight: 'bold',
+        color: isUnlocked ? '#065f46' : '#6b7280',
+        margin: '0 0 0.25rem 0'
+    });
+
+    const achievementDescStyle = (isUnlocked) => ({
+        fontSize: '0.875rem',
+        color: isUnlocked ? '#047857' : '#9ca3af',
+        marginBottom: '0.75rem'
+    });
+
+    const newBadgeStyle = {
+        display: 'inline-block',
+        padding: '0.25rem 0.5rem',
+        backgroundColor: '#f59e0b',
+        color: '#92400e',
+        fontSize: '0.75rem',
+        fontWeight: 'bold',
+        borderRadius: '0.375rem',
+        marginLeft: '0.5rem',
+        animation: 'pulse 2s infinite'
+    };
+
+    const progressContainerStyle = {
+        marginTop: '0.5rem'
+    };
+
+    const progressInfoStyle = {
+        display: 'flex',
+        justifyContent: 'space-between',
+        fontSize: '0.75rem',
+        color: '#6b7280',
+        marginBottom: '0.25rem'
+    };
+
+    const miniProgressBarStyle = {
+        width: '100%',
+        backgroundColor: '#e5e7eb',
+        borderRadius: '0.25rem',
+        height: '0.5rem',
+        overflow: 'hidden'
+    };
+
+    const miniProgressFillStyle = (percentage) => ({
+        background: 'linear-gradient(to right, #3b82f6, #1d4ed8)',
+        height: '100%',
+        borderRadius: 'inherit',
+        width: `${percentage}%`,
+        transition: 'width 0.3s ease'
+    });
+
+    const unlockedBadgeStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        color: '#047857'
+    };
+
+    const checkmarkStyle = {
+        width: '1.25rem',
+        height: '1.25rem',
+        backgroundColor: '#10b981',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '0.75rem'
+    };
+
+    const tipsContainerStyle = {
+        backgroundColor: 'white',
+        padding: '1.5rem',
+        borderRadius: '0.75rem',
+        border: '1px solid #e5e7eb',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+    };
+
+    const tipsTitleStyle = {
+        fontSize: '1.125rem',
+        fontWeight: 'bold',
+        marginBottom: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        color: '#1f2937'
+    };
+
+    const tipsGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '1rem'
+    };
+
+    const tipStyle = {
+        fontSize: '0.875rem',
+        color: '#6b7280',
+        lineHeight: '1.4'
+    };
+
+    const notificationStyle = {
+        position: 'fixed',
+        top: '1rem',
+        right: '1rem',
+        zIndex: 1000,
+        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+        color: 'white',
+        padding: '1rem 1.5rem',
+        borderRadius: '0.75rem',
+        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+        animation: 'slideIn 0.5s ease'
+    };
+
+    const notificationContentStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem'
+    };
+
     if (!playerData) {
         return (
-            <div className="text-center">
-                <h2 className="text-2xl font-bold mb-4">🏆 Postignuća</h2>
-                <p className="text-gray-600 mb-6">Nema dostupnih postignuća za ovog igrača.</p>
+            <div style={{ ...containerStyle, textAlign: 'center' }}>
+                <h2 style={titleStyle}>🏆 Postignuća</h2>
+                <p style={subtitleStyle}>Nema dostupnih postignuća za ovog igrača.</p>
                 <button 
                     onClick={() => setGameState(GAME_STATES.MENU)}
-                    className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                    style={backButtonStyle}
                 >
                     Povratak na meni
                 </button>
@@ -44,15 +298,15 @@ function AchievementsScreen({ playerName, getAllPlayers, setGameState, newAchiev
     const completionPercentage = Math.round((unlockedCount / totalCount) * 100);
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div style={containerStyle}>
             {/* Notifikacija za nova postignuća */}
             {showNotification && newAchievements.length > 0 && (
-                <div className="fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 rounded-lg shadow-lg animate-bounce">
-                    <div className="flex items-center gap-3">
-                        <div className="text-2xl">🎉</div>
+                <div style={notificationStyle}>
+                    <div style={notificationContentStyle}>
+                        <div style={{ fontSize: '1.5rem' }}>🎉</div>
                         <div>
-                            <div className="font-bold">Novo postignuće!</div>
-                            <div className="text-sm">
+                            <div style={{ fontWeight: 'bold' }}>Novo postignuće!</div>
+                            <div style={{ fontSize: '0.875rem' }}>
                                 {newAchievements.map(id => AchievementManager.getAchievementData(id)?.name).join(', ')}
                             </div>
                         </div>
@@ -61,44 +315,43 @@ function AchievementsScreen({ playerName, getAllPlayers, setGameState, newAchiev
             )}
 
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div style={headerStyle}>
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-800">🏆 Postignuća</h2>
-                    <p className="text-gray-600">Tvoja postignuća, {playerName}</p>
+                    <h2 style={titleStyle}>🏆 Postignuća</h2>
+                    <p style={subtitleStyle}>Tvoja postignuća, {playerName}</p>
                 </div>
                 <button 
                     onClick={() => setGameState(GAME_STATES.MENU)}
-                    className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                    style={backButtonStyle}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#4b5563'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
                 >
                     ← Povratak
                 </button>
             </div>
 
             {/* Progress summary */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-100 p-6 rounded-xl border border-blue-200">
-                <div className="flex items-center justify-between mb-4">
+            <div style={progressSummaryStyle}>
+                <div style={progressHeaderStyle}>
                     <div>
-                        <div className="text-3xl font-bold text-blue-600">
+                        <div style={progressCountStyle}>
                             {unlockedCount} / {totalCount}
                         </div>
-                        <div className="text-blue-800 font-medium">Otkrivenih postignuća</div>
+                        <div style={progressLabelStyle}>Otkrivenih postignuća</div>
                     </div>
-                    <div className="text-right">
-                        <div className="text-2xl font-bold text-indigo-600">{completionPercentage}%</div>
-                        <div className="text-indigo-700 text-sm">Završeno</div>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={progressPercentStyle}>{completionPercentage}%</div>
+                        <div style={{ fontSize: '0.875rem', color: '#4338ca' }}>Završeno</div>
                     </div>
                 </div>
                 
-                <div className="w-full bg-blue-200 rounded-full h-3">
-                    <div 
-                        className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500"
-                        style={{ width: `${completionPercentage}%` }}
-                    ></div>
+                <div style={progressBarContainerStyle}>
+                    <div style={progressBarFillStyle(completionPercentage)}></div>
                 </div>
             </div>
 
             {/* Lista postignuća */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={achievementsGridStyle}>
                 {achievementList.map(achievement => {
                     const isUnlocked = achievements.unlocked.includes(achievement.id);
                     const progress = achievements.progress[achievement.id];
@@ -107,60 +360,49 @@ function AchievementsScreen({ playerName, getAllPlayers, setGameState, newAchiev
                     return (
                         <div 
                             key={achievement.id} 
-                            className={`p-6 rounded-xl border transition-all transform hover:scale-105 ${
-                                isUnlocked 
-                                    ? 'bg-gradient-to-br from-green-50 to-emerald-100 border-green-200 shadow-lg' 
-                                    : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 opacity-75'
-                            } ${isNew ? 'ring-4 ring-yellow-400 ring-opacity-50' : ''}`}
+                            style={achievementCardStyle(isUnlocked, isNew)}
                         >
-                            <div className="flex items-start gap-4">
-                                <div className={`text-4xl transition-all ${
-                                    isUnlocked ? 'transform scale-110' : 'grayscale opacity-50'
-                                }`}>
+                            <div style={achievementContentStyle}>
+                                <div style={achievementEmojiStyle(isUnlocked)}>
                                     {isUnlocked ? achievement.emoji : '🔒'}
                                 </div>
                                 
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <h3 className={`font-bold text-lg ${
-                                            isUnlocked ? 'text-green-800' : 'text-gray-600'
-                                        }`}>
+                                <div style={achievementInfoStyle}>
+                                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        <h3 style={achievementNameStyle(isUnlocked)}>
                                             {achievement.name}
                                         </h3>
                                         {isNew && (
-                                            <span className="px-2 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full animate-pulse">
+                                            <span style={newBadgeStyle}>
                                                 NOVO!
                                             </span>
                                         )}
                                     </div>
                                     
-                                    <p className={`text-sm mb-3 ${
-                                        isUnlocked ? 'text-green-700' : 'text-gray-500'
-                                    }`}>
+                                    <p style={achievementDescStyle(isUnlocked)}>
                                         {achievement.description}
                                     </p>
                                     
                                     {!isUnlocked && progress && (
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-xs text-gray-600">
+                                        <div style={progressContainerStyle}>
+                                            <div style={progressInfoStyle}>
                                                 <span>Napredak</span>
                                                 <span>{progress.current} / {progress.target}</span>
                                             </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                                <div 
-                                                    className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-300"
-                                                    style={{ width: `${Math.min((progress.current / progress.target) * 100, 100)}%` }}
-                                                ></div>
+                                            <div style={miniProgressBarStyle}>
+                                                <div style={miniProgressFillStyle(
+                                                    Math.min((progress.current / progress.target) * 100, 100)
+                                                )}></div>
                                             </div>
                                         </div>
                                     )}
                                     
                                     {isUnlocked && (
-                                        <div className="flex items-center gap-2 text-green-600">
-                                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                                <span className="text-white text-xs">✓</span>
+                                        <div style={unlockedBadgeStyle}>
+                                            <div style={checkmarkStyle}>
+                                                ✓
                                             </div>
-                                            <span className="text-sm font-semibold">OTKRIVENO!</span>
+                                            <span style={{ fontSize: '0.875rem', fontWeight: '600' }}>OTKRIVENO!</span>
                                         </div>
                                     )}
                                 </div>
@@ -171,25 +413,45 @@ function AchievementsScreen({ playerName, getAllPlayers, setGameState, newAchiev
             </div>
 
             {/* Dodatne informacije */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <div style={tipsContainerStyle}>
+                <h3 style={tipsTitleStyle}>
                     💡 Savjeti za postignuća
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                    <div>
+                <div style={tipsGridStyle}>
+                    <div style={tipStyle}>
                         <strong>🎯 Savršenstvo:</strong> Završi jedan nivo bez greške ili timeout-a
                     </div>
-                    <div>
+                    <div style={tipStyle}>
                         <strong>🔥 Niz desetke:</strong> Odgovori točno na 10 pitanja u nizu
                     </div>
-                    <div>
+                    <div style={tipStyle}>
                         <strong>⚡ Brzinski demon:</strong> Budi brž od 3 sekunde po pitanju
                     </div>
-                    <div>
+                    <div style={tipStyle}>
                         <strong>📅 Tjedni rekord:</strong> Igraj svaki dan kroz tjedan dana
                     </div>
                 </div>
             </div>
+
+            <style>
+                {`
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                    }
+                `}
+            </style>
         </div>
     );
 }
