@@ -30,40 +30,40 @@ function MenuScreen({
             title: '🎮 Igraj',
             description: 'Počni novu igru',
             action: () => handleButtonClick(() => setGameState(GAME_STATES.GAME_MODES)),
-            color: 'from-blue-500 to-blue-600',
-            hoverColor: 'hover:from-blue-600 hover:to-blue-700'
+            gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            hoverGradient: 'linear-gradient(135deg, #1d4ed8, #1e40af)'
         },
         {
             id: 'statistics',
             title: '📊 Statistike',
             description: 'Pregled napretka i rezultata',
             action: () => handleButtonClick(() => setGameState(GAME_STATES.STATISTICS)),
-            color: 'from-green-500 to-green-600',
-            hoverColor: 'hover:from-green-600 hover:to-green-700'
+            gradient: 'linear-gradient(135deg, #10b981, #047857)',
+            hoverGradient: 'linear-gradient(135deg, #047857, #065f46)'
         },
         {
             id: 'achievements',
             title: '🏆 Postignuća',
             description: 'Otkrivena postignuća i nagrade',
             action: () => handleButtonClick(() => setGameState(GAME_STATES.ACHIEVEMENTS)),
-            color: 'from-yellow-500 to-yellow-600',
-            hoverColor: 'hover:from-yellow-600 hover:to-yellow-700'
+            gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            hoverGradient: 'linear-gradient(135deg, #d97706, #b45309)'
         },
         {
             id: 'leaderboard',
             title: '🏅 Ljestvica',
             description: 'Najbolji rezultati',
             action: () => handleButtonClick(() => setGameState(GAME_STATES.LEADERBOARD)),
-            color: 'from-purple-500 to-purple-600',
-            hoverColor: 'hover:from-purple-600 hover:to-purple-700'
+            gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+            hoverGradient: 'linear-gradient(135deg, #7c3aed, #6d28d9)'
         },
         {
             id: 'settings',
             title: '⚙️ Postavke',
             description: 'Personaliziraj svoju igru',
             action: () => handleButtonClick(() => setGameState(GAME_STATES.SETTINGS)),
-            color: 'from-gray-500 to-gray-600',
-            hoverColor: 'hover:from-gray-600 hover:to-gray-700'
+            gradient: 'linear-gradient(135deg, #6b7280, #4b5563)',
+            hoverGradient: 'linear-gradient(135deg, #4b5563, #374151)'
         }
     ];
 
@@ -71,17 +71,162 @@ function MenuScreen({
     const playerStats = playerData?.statistics || {};
     const achievements = playerData?.statistics?.achievements || { unlocked: [] };
 
+    // Inline stilovi
+    const containerStyle = {
+        maxWidth: '1024px',
+        margin: '0 auto',
+        padding: '1.5rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    };
+
+    const headerStyle = {
+        textAlign: 'center',
+        marginBottom: '2rem'
+    };
+
+    const playerInfoStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem',
+        marginBottom: '1rem'
+    };
+
+    const titleStyle = {
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        margin: '0 0 0.5rem 0'
+    };
+
+    const subtitleStyle = {
+        fontSize: '1.125rem',
+        color: '#6b7280',
+        margin: 0
+    };
+
+    const statsGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '1rem',
+        marginTop: '1.5rem'
+    };
+
+    const statCardStyle = {
+        backgroundColor: '#f8fafc',
+        border: '1px solid #e5e7eb',
+        borderRadius: '0.5rem',
+        padding: '1rem',
+        textAlign: 'center'
+    };
+
+    const statValueStyle = {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        color: '#3b82f6',
+        margin: '0 0 0.25rem 0'
+    };
+
+    const statLabelStyle = {
+        fontSize: '0.875rem',
+        color: '#6b7280',
+        margin: 0
+    };
+
+    const menuGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '1rem',
+        marginBottom: '2rem'
+    };
+
+    const getButtonStyle = (option, isHovered = false) => ({
+        background: isHovered ? option.hoverGradient : option.gradient,
+        color: 'white',
+        border: 'none',
+        borderRadius: '0.75rem',
+        padding: '1.5rem',
+        textAlign: 'left',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        transform: isHovered ? 'translateY(-2px) scale(1.02)' : 'translateY(0) scale(1)',
+        boxShadow: isHovered ? '0 10px 25px rgba(0,0,0,0.2)' : '0 4px 15px rgba(0,0,0,0.1)',
+        fontFamily: 'inherit',
+        width: '100%'
+    });
+
+    const buttonTitleStyle = {
+        fontSize: '1.25rem',
+        fontWeight: 'bold',
+        margin: '0 0 0.5rem 0'
+    };
+
+    const buttonDescStyle = {
+        fontSize: '0.875rem',
+        opacity: 0.9,
+        margin: 0
+    };
+
+    const quickActionsStyle = {
+        borderTop: '1px solid #e5e7eb',
+        paddingTop: '1.5rem'
+    };
+
+    const quickActionsTitleStyle = {
+        fontSize: '1.125rem',
+        fontWeight: 'bold',
+        marginBottom: '1rem',
+        color: '#1f2937'
+    };
+
+    const quickButtonsStyle = {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '0.75rem'
+    };
+
+    const quickButtonStyle = {
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        border: 'none',
+        fontWeight: '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        fontFamily: 'inherit'
+    };
+
+    const getQuickButtonStyle = (variant) => {
+        const variants = {
+            primary: {
+                backgroundColor: '#dbeafe',
+                color: '#1e40af',
+                ':hover': { backgroundColor: '#bfdbfe' }
+            },
+            success: {
+                backgroundColor: '#d1fae5',
+                color: '#065f46',
+                ':hover': { backgroundColor: '#a7f3d0' }
+            },
+            purple: {
+                backgroundColor: '#e9d5ff',
+                color: '#6b21a8',
+                ':hover': { backgroundColor: '#ddd6fe' }
+            }
+        };
+        return { ...quickButtonStyle, ...variants[variant] };
+    };
+
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div style={containerStyle}>
             {/* Player Info Header */}
-            <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-4 mb-4">
-                    <div className="text-4xl">{avatar.emoji}</div>
+            <div style={headerStyle}>
+                <div style={playerInfoStyle}>
+                    <div style={{ fontSize: '2.5rem' }}>{avatar.emoji}</div>
                     <div>
-                        <h2 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                        <h2 style={titleStyle}>
                             Dobro došao, {playerName}!
                         </h2>
-                        <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+                        <p style={subtitleStyle}>
                             Odaberi što želiš raditi
                         </p>
                     </div>
@@ -89,51 +234,39 @@ function MenuScreen({
 
                 {/* Quick Stats */}
                 {playerData && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                        <div className="p-4 rounded-lg" style={{ 
-                            backgroundColor: 'var(--bg-card, #ffffff)', 
-                            border: '1px solid var(--border-color, #d1d5db)' 
-                        }}>
-                            <div className="text-2xl font-bold" style={{ color: 'var(--accent-color)' }}>
+                    <div style={statsGridStyle}>
+                        <div style={statCardStyle}>
+                            <div style={statValueStyle}>
                                 {playerData.bestScore}
                             </div>
-                            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <div style={statLabelStyle}>
                                 Najbolji rezultat
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-lg" style={{ 
-                            backgroundColor: 'var(--bg-card, #ffffff)', 
-                            border: '1px solid var(--border-color, #d1d5db)' 
-                        }}>
-                            <div className="text-2xl font-bold" style={{ color: 'var(--accent-color)' }}>
+                        <div style={statCardStyle}>
+                            <div style={statValueStyle}>
                                 {playerData.maxLevel}
                             </div>
-                            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <div style={statLabelStyle}>
                                 Najviši nivo
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-lg" style={{ 
-                            backgroundColor: 'var(--bg-card, #ffffff)', 
-                            border: '1px solid var(--border-color, #d1d5db)' 
-                        }}>
-                            <div className="text-2xl font-bold" style={{ color: 'var(--accent-color)' }}>
+                        <div style={statCardStyle}>
+                            <div style={statValueStyle}>
                                 {playerStats.averageAccuracy?.toFixed(0) || 0}%
                             </div>
-                            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <div style={statLabelStyle}>
                                 Točnost
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-lg" style={{ 
-                            backgroundColor: 'var(--bg-card, #ffffff)', 
-                            border: '1px solid var(--border-color, #d1d5db)' 
-                        }}>
-                            <div className="text-2xl font-bold" style={{ color: 'var(--accent-color)' }}>
+                        <div style={statCardStyle}>
+                            <div style={statValueStyle}>
                                 {achievements.unlocked.length}
                             </div>
-                            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <div style={statLabelStyle}>
                                 Postignuća
                             </div>
                         </div>
@@ -142,28 +275,34 @@ function MenuScreen({
             </div>
 
             {/* Menu Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {menuOptions.map((option) => (
-                    <button
-                        key={option.id}
-                        onClick={option.action}
-                        className={`p-6 rounded-xl text-white font-bold text-left transition-all transform hover:scale-105 hover:shadow-lg bg-gradient-to-br ${option.color} ${option.hoverColor}`}
-                    >
-                        <div className="text-xl mb-2">{option.title}</div>
-                        <div className="text-sm opacity-90">{option.description}</div>
-                    </button>
-                ))}
+            <div style={menuGridStyle}>
+                {menuOptions.map((option) => {
+                    const [isHovered, setIsHovered] = React.useState(false);
+                    
+                    return (
+                        <button
+                            key={option.id}
+                            onClick={option.action}
+                            style={getButtonStyle(option, isHovered)}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                            <div style={buttonTitleStyle}>{option.title}</div>
+                            <div style={buttonDescStyle}>{option.description}</div>
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Quick Actions */}
-            <div className="border-t pt-6" style={{ borderColor: 'var(--border-color, #d1d5db)' }}>
-                <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+            <div style={quickActionsStyle}>
+                <h3 style={quickActionsTitleStyle}>
                     ⚡ Brze akcije
                 </h3>
-                <div className="flex flex-wrap gap-3">
+                <div style={quickButtonsStyle}>
                     <button
                         onClick={() => handleButtonClick(() => startGame())}
-                        className="px-4 py-2 rounded-lg font-medium transition-colors bg-blue-100 text-blue-800 hover:bg-blue-200"
+                        style={getQuickButtonStyle('primary')}
                     >
                         🚀 Brza igra
                     </button>
@@ -171,7 +310,7 @@ function MenuScreen({
                     {isJsonBinConfigured && (
                         <button
                             onClick={() => handleButtonClick(refreshCloudData)}
-                            className="px-4 py-2 rounded-lg font-medium transition-colors bg-green-100 text-green-800 hover:bg-green-200"
+                            style={getQuickButtonStyle('success')}
                         >
                             ☁️ Osvježi podatke
                         </button>
@@ -179,7 +318,7 @@ function MenuScreen({
                     
                     <button
                         onClick={() => handleButtonClick(exportResults)}
-                        className="px-4 py-2 rounded-lg font-medium transition-colors bg-purple-100 text-purple-800 hover:bg-purple-200"
+                        style={getQuickButtonStyle('purple')}
                     >
                         📥 Izvezi podatke
                     </button>
