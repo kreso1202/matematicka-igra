@@ -1,6 +1,6 @@
 import { Heart, Clock } from '../Icons';
 import { GameLogic } from '../../services/gameLogic';
-import { FEEDBACK_TYPES } from '../../services/gameConfig';
+import { FEEDBACK_TYPES, GAME_STATES } from '../../services/gameConfig';
 
 function GameScreen({ 
     currentQuestion, 
@@ -15,9 +15,17 @@ function GameScreen({
     questionsInLevel,
     streak,
     getLevelProgress,
-    checkAnswer
+    checkAnswer,
+    setGameState,
+    gameMode
 }) {
     const levelData = GameLogic.getCurrentLevelData(currentLevel);
+
+    const handleQuitGame = () => {
+        if (window.confirm('Jeste li sigurni da želite prekinuti igru? Sav napredak će biti izgubljen.')) {
+            setGameState(GAME_STATES.MENU);
+        }
+    };
 
     const renderFeedback = () => {
         if (!showFeedback) return null;
@@ -48,15 +56,31 @@ function GameScreen({
 
     return (
         <div className="text-center">
+            {/* Header with Quit button */}
+            <div className="flex justify-between items-center mb-4">
+                <button
+                    onClick={handleQuitGame}
+                    className="text-sm bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors"
+                >
+                    ❌ Prekini
+                </button>
+                <div className="text-sm text-gray-600">
+                    {gameMode === 'training' ? 'Trening način' : `Nivo ${currentLevel}`}
+                </div>
+            </div>
+
             {/* Lives and Score */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex gap-1">
-                    {[...Array(3)].map((_, i) => (
+                    {gameMode !== 'training' && [...Array(3)].map((_, i) => (
                         <Heart 
                             key={i} 
                             className={`w-5 h-5 ${i < lives ? 'text-red-500 fill-current' : 'text-gray-300'}`} 
                         />
                     ))}
+                    {gameMode === 'training' && (
+                        <span className="text-sm text-green-600 font-bold">∞ Beskonačni životi</span>
+                    )}
                 </div>
                 <div className="text-lg font-bold text-purple-600">
                     <span className={score > 0 ? 'animate-pulse' : ''}>{score}</span> 🌟
@@ -86,10 +110,16 @@ function GameScreen({
             {/* Timer and Streak */}
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
-                    <Clock className="text-blue-500" size={18} />
-                    <span className={`text-lg font-bold ${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`}>
-                        {timeLeft}s
-                    </span>
+                    {gameMode !== 'training' ? (
+                        <>
+                            <Clock className="text-blue-500" size={18} />
+                            <span className={`text-lg font-bold ${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`}>
+                                {timeLeft}s
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-sm text-blue-600">⌛ Bez vremenskog ograničenja</span>
+                    )}
                 </div>
                 {streak > 0 && (
                     <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-bold">
