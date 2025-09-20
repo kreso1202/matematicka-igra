@@ -27,7 +27,7 @@ body {
   max-width: 28rem;
 }
 
-/* Button styling */
+/* Button styling - CENTERED TEXT */
 .button-primary {
   width: 100%;
   background: linear-gradient(45deg, #667eea, #764ba2);
@@ -40,6 +40,7 @@ body {
   cursor: pointer;
   transition: transform 0.2s;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .button-primary:hover:not(:disabled) {
@@ -63,6 +64,7 @@ body {
   cursor: pointer;
   transition: transform 0.2s;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .button-secondary:hover {
@@ -98,7 +100,7 @@ body {
   background: linear-gradient(45deg, #818cf8, #4f46e5);
 }
 
-/* Game mode button styling */
+/* Game mode button styling - CENTERED TEXT */
 .w-full.bg-gradient-to-r {
   width: 100%;
   color: white;
@@ -112,10 +114,31 @@ body {
   margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  text-align: center;
 }
 
 .w-full.bg-gradient-to-r:hover {
+  transform: scale(1.05);
+}
+
+/* Green to blue gradient button - CENTERED */
+.w-full.bg-gradient-to-r.from-green-400.to-blue-500 {
+  width: 100%;
+  background: linear-gradient(45deg, #4ade80, #3b82f6);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.w-full.bg-gradient-to-r.from-green-400.to-blue-500:hover {
   transform: scale(1.05);
 }
 
@@ -301,21 +324,7 @@ p {
   75%, 100% { transform: scale(2); opacity: 0; }
 }
 
-/* Game buttons */
-.w-full.bg-gradient-to-r.from-green-400.to-blue-500 {
-  width: 100%;
-  background: linear-gradient(45deg, #4ade80, #3b82f6);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-  margin-bottom: 0.75rem;
-}
-
+/* Green export button */
 .w-full.bg-green-500 {
   width: 100%;
   background: #22c55e;
@@ -331,6 +340,7 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .w-full.bg-green-500:hover:not(:disabled) {
