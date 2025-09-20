@@ -37,7 +37,7 @@ function MenuScreen({ playerName, setGameState, isJsonBinConfigured, getAllPlaye
                 
                 <button 
                     onClick={startGame}
-                    className="w-full bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold py-3 px-6 rounded-xl text-lg hover:scale-105 transform transition-all duration-200"
+                    className="button-primary"
                 >
                     ⚡ Brza igra
                 </button>
