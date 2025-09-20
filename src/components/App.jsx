@@ -1,10 +1,10 @@
-import GameModesScreen from './screens/GameModesScreen.jsx';
 import { useState, useEffect } from 'react';
-import { GAME_STATES, FEEDBACK_TYPES } from '../services/gameConfig.js';
+import { GAME_STATES, FEEDBACK_TYPES, GAME_MODES } from '../services/gameConfig.js';
 import { CloudStorage, LocalStorage } from '../services/cloudStorage.js';
 import { GameLogic, PlayerManager } from '../services/gameLogic.js';
 import WelcomeScreen from './screens/WelcomeScreen.jsx';
 import MenuScreen from './screens/MenuScreen.jsx';
+import GameModesScreen from './screens/GameModesScreen.jsx';
 import GameScreen from './screens/GameScreen.jsx';
 import LevelCompleteScreen from './screens/LevelCompleteScreen.jsx';
 import GameOverScreen from './screens/GameOverScreen.jsx';
@@ -16,6 +16,7 @@ function App() {
     // Game state
     const [gameState, setGameState] = useState(GAME_STATES.WELCOME);
     const [playerName, setPlayerName] = useState('');
+    const [gameMode, setGameMode] = useState(GAME_MODES.CLASSIC);
     
     // Question state
     const [currentQuestion, setCurrentQuestion] = useState('');
@@ -81,10 +82,11 @@ function App() {
         setTimeLeft(levelData.timeLimit);
     };
 
-    const startGame = () => {
+    const startGame = (selectedGameMode = GAME_MODES.CLASSIC) => {
         setGameState(GAME_STATES.PLAYING);
+        setGameMode(selectedGameMode);
         setScore(0);
-        setLives(3);
+        setLives(selectedGameMode === GAME_MODES.TRAINING ? 999 : 3); // Infinite lives for training
         setCurrentLevel(1);
         setQuestionsInLevel(0);
         setStreak(0);
@@ -100,7 +102,7 @@ function App() {
         setShowFeedback('');
         setCurrentLevel(currentLevel + 1);
         setQuestionsInLevel(0);
-        setLives(3);
+        setLives(gameMode === GAME_MODES.TRAINING ? 999 : 3);
         setGameState(GAME_STATES.PLAYING);
         setTimeout(() => {
             generateQuestion();
@@ -145,24 +147,41 @@ function App() {
     };
 
     const handleWrongAnswer = () => {
-        setLives(lives - 1);
-        setStreak(0);
-        setSessionStats(prev => ({ ...prev, wrong: prev.wrong + 1 }));
-        setShowFeedback(FEEDBACK_TYPES.WRONG);
-        
-        setTimeout(() => {
-            setAnswer('');
-            setShowFeedback('');
-            if (lives - 1 <= 0) {
-                endGame();
-            } else {
+        if (gameMode === GAME_MODES.TRAINING) {
+            // In training mode, just show feedback and continue
+            setShowFeedback(FEEDBACK_TYPES.WRONG);
+            setSessionStats(prev => ({ ...prev, wrong: prev.wrong + 1 }));
+            setTimeout(() => {
+                setAnswer('');
+                setShowFeedback('');
                 generateQuestion();
                 GameLogic.focusInput(100);
-            }
-        }, 2000);
+            }, 2000);
+        } else {
+            setLives(lives - 1);
+            setStreak(0);
+            setSessionStats(prev => ({ ...prev, wrong: prev.wrong + 1 }));
+            setShowFeedback(FEEDBACK_TYPES.WRONG);
+            
+            setTimeout(() => {
+                setAnswer('');
+                setShowFeedback('');
+                if (lives - 1 <= 0) {
+                    endGame();
+                } else {
+                    generateQuestion();
+                    GameLogic.focusInput(100);
+                }
+            }, 2000);
+        }
     };
 
     const handleTimeout = () => {
+        if (gameMode === GAME_MODES.TRAINING) {
+            // In training mode, no time limit
+            return;
+        }
+        
         setLives(lives - 1);
         setStreak(0);
         setSessionStats(prev => ({ ...prev, timeouts: prev.timeouts + 1 }));
@@ -205,17 +224,15 @@ function App() {
     const getLevelProgress = () => GameLogic.getLevelProgress(questionsInLevel, currentLevel);
     const exportResults = () => LocalStorage.exportData();
 
-    // FIXED: Proper refresh function
     const refreshCloudData = async () => {
         if (!isJsonBinConfigured()) return;
         
         setIsLoading(true);
         try {
             const freshData = await CloudStorage.loadFromCloud();
-            // Force update with fresh timestamp
             setCloudData({
                 ...freshData,
-                lastUpdate: freshData.lastUpdate || new Date().toISOString()
+                lastRefresh: new Date().toISOString()
             });
             setIsOnline(true);
         } catch (error) {
@@ -235,13 +252,13 @@ function App() {
     }, [localData]);
 
     useEffect(() => {
-        if (gameState === GAME_STATES.PLAYING && timeLeft > 0) {
+        if (gameState === GAME_STATES.PLAYING && timeLeft > 0 && gameMode !== GAME_MODES.TRAINING) {
             const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
             return () => clearTimeout(timer);
-        } else if (timeLeft === 0 && gameState === GAME_STATES.PLAYING) {
+        } else if (timeLeft === 0 && gameState === GAME_STATES.PLAYING && gameMode !== GAME_MODES.TRAINING) {
             handleTimeout();
         }
-    }, [timeLeft, gameState]);
+    }, [timeLeft, gameState, gameMode]);
 
     useEffect(() => {
         if (gameState === GAME_STATES.PLAYING && currentQuestion && !showFeedback) {
@@ -265,7 +282,8 @@ function App() {
         currentLevel,
         score,
         sessionStats,
-        streak
+        streak,
+        gameMode
     };
 
     const gameProps = {
@@ -303,6 +321,7 @@ function App() {
 
                 {gameState === GAME_STATES.WELCOME && <WelcomeScreen {...commonProps} />}
                 {gameState === GAME_STATES.MENU && <MenuScreen {...commonProps} />}
+                {gameState === GAME_STATES.GAME_MODES && <GameModesScreen {...commonProps} />}
                 {gameState === GAME_STATES.PLAYING && <GameScreen {...gameProps} />}
                 {gameState === GAME_STATES.LEVEL_COMPLETE && <LevelCompleteScreen {...commonProps} />}
                 {gameState === GAME_STATES.GAME_OVER && <GameOverScreen {...commonProps} />}
