@@ -1,36 +1,16 @@
-import { LEVELS, GAME_MODES, DIFFICULTY_LEVELS, MATH_TIPS } from './gameConfig.js';
+import { LEVELS } from './gameConfig.js';
 
 export class GameLogic {
-    static getCurrentLevelData(currentLevel, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
-        const level = LEVELS.find(l => l.id === currentLevel);
-        if (level && level.difficulty && level.difficulty[difficulty]) {
-            return { ...level, ...level.difficulty[difficulty] };
-        }
-        return level;
+    static getCurrentLevelData(currentLevel) {
+        return LEVELS.find(l => l.id === currentLevel);
     }
 
-    static generateQuestion(currentLevel, gameMode = GAME_MODES.CLASSIC, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
-        const levelData = this.getCurrentLevelData(currentLevel, difficulty);
-        
-        // Special logic for specific game modes
-        switch (gameMode) {
-            case GAME_MODES.MULTIPLICATION:
-                return this.generateMultiplicationQuestion(levelData);
-            case GAME_MODES.DIVISION:
-                return this.generateDivisionQuestion(levelData);
-            case GAME_MODES.ADDITION:
-                return this.generateAdditionQuestion(levelData);
-            case GAME_MODES.SUBTRACTION:
-                return this.generateSubtractionQuestion(levelData);
-            default:
-                return this.generateClassicQuestion(levelData);
-        }
-    }
-
-    static generateClassicQuestion(levelData) {
+    static generateQuestion(currentLevel) {
+        const levelData = this.getCurrentLevelData(currentLevel);
         let operations = [...levelData.operations];
         let operation;
 
+        // Use weights for higher levels to favor multiplication/division
         if (levelData.multiplyWeight && Math.random() < levelData.multiplyWeight) {
             const multiplyOps = operations.filter(op => op === '×' || op === '÷');
             if (multiplyOps.length > 0) {
@@ -42,26 +22,6 @@ export class GameLogic {
             operation = operations[Math.floor(Math.random() * operations.length)];
         }
 
-        return this.generateByOperation(operation, levelData);
-    }
-
-    static generateMultiplicationQuestion(levelData) {
-        return this.generateByOperation('×', levelData);
-    }
-
-    static generateDivisionQuestion(levelData) {
-        return this.generateByOperation('÷', levelData);
-    }
-
-    static generateAdditionQuestion(levelData) {
-        return this.generateByOperation('+', levelData);
-    }
-
-    static generateSubtractionQuestion(levelData) {
-        return this.generateByOperation('-', levelData);
-    }
-
-    static generateByOperation(operation, levelData) {
         let num1, num2, result, question;
 
         switch (operation) {
@@ -104,36 +64,23 @@ export class GameLogic {
                 break;
         }
 
-        return { question, correctAnswer: result, operation };
+        return { question, correctAnswer: result };
     }
 
-    static calculateScore(timeLeft, streak, currentLevel, gameMode = GAME_MODES.CLASSIC) {
+    static calculateScore(timeLeft, streak, currentLevel) {
         const timeBonus = timeLeft * 2;
         const streakBonus = streak * 5;
         const levelBonus = currentLevel * 10;
-        
-        // Mode-specific bonuses
-        let modeBonus = 0;
-        switch (gameMode) {
-            case GAME_MODES.SPRINT:
-                modeBonus = 5;
-                break;
-            case GAME_MODES.MULTIPLICATION:
-            case GAME_MODES.DIVISION:
-                modeBonus = 15;
-                break;
-        }
-        
-        return 20 + timeBonus + streakBonus + levelBonus + modeBonus;
+        return 20 + timeBonus + streakBonus + levelBonus;
     }
 
-    static getLevelProgress(questionsInLevel, currentLevel, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
-        const levelData = this.getCurrentLevelData(currentLevel, difficulty);
+    static getLevelProgress(questionsInLevel, currentLevel) {
+        const levelData = this.getCurrentLevelData(currentLevel);
         return Math.min((questionsInLevel / levelData.questionsNeeded) * 100, 100);
     }
 
-    static shouldLevelUp(questionsInLevel, currentLevel, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
-        const levelData = this.getCurrentLevelData(currentLevel, difficulty);
+    static shouldLevelUp(questionsInLevel, currentLevel) {
+        const levelData = this.getCurrentLevelData(currentLevel);
         return questionsInLevel >= levelData.questionsNeeded;
     }
 
@@ -149,13 +96,6 @@ export class GameLogic {
                 input.select();
             }
         }, delay);
-    }
-
-    static getTipForOperation(operation) {
-        const tips = MATH_TIPS[operation === '×' ? 'multiplication' : 
-                              operation === '÷' ? 'division' :
-                              operation === '+' ? 'addition' : 'subtraction'];
-        return tips[Math.floor(Math.random() * tips.length)];
     }
 }
 
@@ -184,52 +124,24 @@ export class PlayerManager {
             .slice(0, limit);
     }
 
-    static updatePlayerData(allPlayers, playerName, score, currentLevel, sessionStats, gameMode = GAME_MODES.CLASSIC) {
+    static updatePlayerData(allPlayers, playerName, score, currentLevel, sessionStats) {
         const newResult = {
             date: new Date().toLocaleDateString('hr-HR'),
             time: new Date().toLocaleTimeString('hr-HR'),
             score: score,
             level: currentLevel,
-            stats: sessionStats,
-            gameMode: gameMode
+            stats: sessionStats
         };
 
-        const existingPlayer = allPlayers[playerName] || {};
-        
         return {
             ...allPlayers,
             [playerName]: {
                 name: playerName,
-                bestScore: Math.max(score, existingPlayer.bestScore || 0),
-                maxLevel: Math.max(currentLevel, existingPlayer.maxLevel || 1),
-                gamesPlayed: (existingPlayer.gamesPlayed || 0) + 1,
-                totalQuestions: (existingPlayer.totalQuestions || 0) + (sessionStats.correct + sessionStats.wrong + sessionStats.timeouts),
-                totalCorrect: (existingPlayer.totalCorrect || 0) + sessionStats.correct,
-                results: [...(existingPlayer.results || []), newResult].slice(-10),
-                achievements: existingPlayer.achievements || [],
-                avatar: existingPlayer.avatar || 'robot',
-                theme: existingPlayer.theme || 'default',
-                settings: {
-                    difficulty: DIFFICULTY_LEVELS.MEDIUM,
-                    soundEnabled: true,
-                    ...existingPlayer.settings
-                },
-                dailyStats: this.updateDailyStats(existingPlayer.dailyStats || {}, sessionStats),
-                lastPlayed: new Date().toISOString()
+                bestScore: Math.max(score, allPlayers[playerName]?.bestScore || 0),
+                maxLevel: Math.max(currentLevel, allPlayers[playerName]?.maxLevel || 1),
+                gamesPlayed: (allPlayers[playerName]?.gamesPlayed || 0) + 1,
+                results: [...(allPlayers[playerName]?.results || []), newResult].slice(-10)
             }
         };
     }
-
-    static updateDailyStats(dailyStats, sessionStats) {
-        const today = new Date().toDateString();
-        const todayStats = dailyStats[today] || { correct: 0, wrong: 0, timeouts: 0, gamesPlayed: 0 };
-        
-        return {
-            ...dailyStats,
-            [today]: {
-                correct: todayStats.correct + sessionStats.correct,
-                wrong: todayStats.wrong + sessionStats.wrong,
-                timeouts: todayStats.timeouts + sessionStats.timeouts,
-                gamesPlayed: todayStats.gamesPlayed + 1
-            }
-        };
+}
