@@ -17,6 +17,116 @@ import SettingsScreen from './screens/SettingsScreen.jsx';
 import CloudStatus from './common/CloudStatus.jsx';
 import { Cloud } from './Icons.jsx';
 
+// CSS stilovi direktno u komponenti
+const appStyles = `
+  /* Base CSS Variables */
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-card: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --accent-color: #3b82f6;
+    --border-color: #d1d5db;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
+  }
+
+  /* Dark Theme */
+  .theme-dark {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-card: #374151;
+    --text-primary: #ffffff;
+    --text-secondary: #d1d5db;
+    --accent-color: #6366f1;
+    --border-color: #4b5563;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --success-color: #34d399;
+    --error-color: #f87171;
+    --warning-color: #fbbf24;
+  }
+
+  /* Ocean Theme */
+  .theme-ocean {
+    --bg-primary: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+    --bg-secondary: #b3e5fc;
+    --bg-card: #ffffff;
+    --text-primary: #0d47a1;
+    --text-secondary: #1565c0;
+    --accent-color: #00acc1;
+    --border-color: #81d4fa;
+    --shadow: rgba(0, 172, 193, 0.2);
+    --success-color: #00695c;
+    --error-color: #d32f2f;
+    --warning-color: #f57c00;
+  }
+
+  /* Forest Theme */
+  .theme-forest {
+    --bg-primary: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    --bg-secondary: #c8e6c9;
+    --bg-card: #ffffff;
+    --text-primary: #1b5e20;
+    --text-secondary: #2e7d32;
+    --accent-color: #4caf50;
+    --border-color: #a5d6a7;
+    --shadow: rgba(76, 175, 80, 0.2);
+    --success-color: #388e3c;
+    --error-color: #d32f2f;
+    --warning-color: #f57c00;
+  }
+
+  /* Space Theme */
+  .theme-space {
+    --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+    --bg-secondary: #1a1a3e;
+    --bg-card: #2d2d5f;
+    --text-primary: #ffffff;
+    --text-secondary: #ccccff;
+    --accent-color: #9c27b0;
+    --border-color: #6a1b9a;
+    --shadow: rgba(156, 39, 176, 0.3);
+    --success-color: #7b1fa2;
+    --error-color: #e91e63;
+    --warning-color: #ff9800;
+  }
+
+  /* Game Container Styles */
+  .game-container {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    padding: 1rem;
+  }
+
+  .game-card {
+    max-width: 72rem;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 25px var(--shadow);
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .game-container {
+      padding: 0.5rem;
+    }
+    
+    .game-card {
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+  }
+`;
+
 function App() {
     // Game state
     const [gameState, setGameState] = useState(GAME_STATES.WELCOME);
@@ -50,6 +160,17 @@ function App() {
     // Cloud data
     const [cloudData, setCloudData] = useState({ players: {}, lastUpdate: null });
     const [localData, setLocalData] = useState(() => LocalStorage.load());
+
+    // Injekt CSS u head
+    useEffect(() => {
+        const styleElement = document.createElement('style');
+        styleElement.textContent = appStyles;
+        document.head.appendChild(styleElement);
+        
+        return () => {
+            document.head.removeChild(styleElement);
+        };
+    }, []);
 
     // Helper functions
     const isJsonBinConfigured = () => CloudStorage.isConfigured();
