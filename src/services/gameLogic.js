@@ -124,24 +124,104 @@ export class PlayerManager {
             .slice(0, limit);
     }
 
-    static updatePlayerData(allPlayers, playerName, score, currentLevel, sessionStats) {
+    static updatePlayerData(allPlayers, playerName, score, currentLevel, sessionStats, gameTime = 0, preferences = {}) {
+        const existing = allPlayers[playerName] || {
+            name: playerName,
+            bestScore: 0,
+            maxLevel: 1,
+            gamesPlayed: 0,
+            results: [],
+            statistics: {
+                totalTimeSpent: 0,
+                totalQuestionsAnswered: 0,
+                totalCorrectAnswers: 0,
+                bestStreak: 0,
+                averageAccuracy: 0,
+                levelStats: {},
+                dailyStats: {},
+                achievements: { unlocked: [], progress: {} },
+                preferences: {
+                    theme: 'default',
+                    avatar: 'robot',
+                    soundEnabled: true,
+                    difficulty: 'medium',
+                    showTips: true,
+                    ...preferences
+                }
+            }
+        };
+
+        // Ažurirati statistike
+        const totalQuestions = sessionStats.correct + sessionStats.wrong + sessionStats.timeouts;
+        const newTotalCorrect = existing.statistics.totalCorrectAnswers + sessionStats.correct;
+        const newTotalQuestions = existing.statistics.totalQuestionsAnswered + totalQuestions;
+        
+        const newStats = {
+            ...existing.statistics,
+            totalTimeSpent: existing.statistics.totalTimeSpent + gameTime,
+            totalQuestionsAnswered: newTotalQuestions,
+            totalCorrectAnswers: newTotalCorrect,
+            averageAccuracy: newTotalQuestions > 0 ? (newTotalCorrect / newTotalQuestions * 100) : 0,
+            bestStreak: Math.max(existing.statistics.bestStreak || 0, sessionStats.maxStreak || 0),
+            levelStats: {
+                ...existing.statistics.levelStats,
+                [currentLevel]: {
+                    gamesPlayed: (existing.statistics.levelStats[currentLevel]?.gamesPlayed || 0) + 1,
+                    questionsAnswered: (existing.statistics.levelStats[currentLevel]?.questionsAnswered || 0) + totalQuestions,
+                    correctAnswers: (existing.statistics.levelStats[currentLevel]?.correctAnswers || 0) + sessionStats.correct,
+                    bestScore: Math.max(existing.statistics.levelStats[currentLevel]?.bestScore || 0, score)
+                }
+            },
+            dailyStats: {
+                ...existing.statistics.dailyStats,
+                [new Date().toDateString()]: {
+                    gamesPlayed: (existing.statistics.dailyStats[new Date().toDateString()]?.gamesPlayed || 0) + 1,
+                    timeSpent: (existing.statistics.dailyStats[new Date().toDateString()]?.timeSpent || 0) + gameTime,
+                    questionsAnswered: (existing.statistics.dailyStats[new Date().toDateString()]?.questionsAnswered || 0) + totalQuestions
+                }
+            }
+        };
+
         const newResult = {
             date: new Date().toLocaleDateString('hr-HR'),
             time: new Date().toLocaleTimeString('hr-HR'),
             score: score,
             level: currentLevel,
-            stats: sessionStats
+            stats: sessionStats,
+            gameTime: gameTime
         };
 
         return {
             ...allPlayers,
             [playerName]: {
-                name: playerName,
-                bestScore: Math.max(score, allPlayers[playerName]?.bestScore || 0),
-                maxLevel: Math.max(currentLevel, allPlayers[playerName]?.maxLevel || 1),
-                gamesPlayed: (allPlayers[playerName]?.gamesPlayed || 0) + 1,
-                results: [...(allPlayers[playerName]?.results || []), newResult].slice(-10)
+                ...existing,
+                bestScore: Math.max(score, existing.bestScore),
+                maxLevel: Math.max(currentLevel, existing.maxLevel),
+                gamesPlayed: existing.gamesPlayed + 1,
+                results: [...existing.results, newResult].slice(-20), // zadnjih 20 igara
+                statistics: newStats
             }
         };
+    }
+
+    static getPlayerStatistics(playerData) {
+        return playerData?.statistics || {};
+    }
+
+    static getDailyProgress(playerData, days = 7) {
+        const dailyStats = playerData?.statistics?.dailyStats || {};
+        const last7Days = [];
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toDateString();
+            last7Days.push({
+                date: date.toLocaleDateString('hr-HR'),
+                ...dailyStats[dateStr] || { gamesPlayed: 0, timeSpent: 0, questionsAnswered: 0 }
+            });
+        }
+        
+        return last7Days;
     }
 }
