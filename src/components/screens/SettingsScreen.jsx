@@ -13,6 +13,260 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
     const [selectedDifficulty, setSelectedDifficulty] = useState(preferences.difficulty || 'medium');
     const [showTips, setShowTips] = useState(preferences.showTips !== false);
 
+    // Inline stilovi
+    const containerStyle = {
+        maxWidth: '1024px',
+        margin: '0 auto',
+        padding: '1.5rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    };
+
+    const headerStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '1.5rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
+    };
+
+    const titleStyle = {
+        fontSize: '1.875rem',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        margin: 0
+    };
+
+    const subtitleStyle = {
+        color: '#6b7280',
+        margin: '0.25rem 0 0 0'
+    };
+
+    const backButtonStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        backgroundColor: '#6b7280',
+        color: 'white',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        transition: 'background-color 0.2s ease'
+    };
+
+    const sectionStyle = {
+        backgroundColor: 'white',
+        padding: '1.5rem',
+        borderRadius: '0.75rem',
+        border: '1px solid #e5e7eb',
+        marginBottom: '1.5rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+    };
+
+    const sectionTitleStyle = {
+        fontSize: '1.25rem',
+        fontWeight: 'bold',
+        marginBottom: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        color: '#1f2937'
+    };
+
+    const avatarGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+        gap: '0.75rem',
+        marginBottom: '1rem'
+    };
+
+    const avatarButtonStyle = (isSelected) => ({
+        padding: '1rem',
+        borderRadius: '0.75rem',
+        border: `2px solid ${isSelected ? '#3b82f6' : '#e5e7eb'}`,
+        backgroundColor: isSelected ? '#dbeafe' : 'white',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        textAlign: 'center',
+        fontFamily: 'inherit',
+        boxShadow: isSelected ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
+    });
+
+    const avatarEmojiStyle = {
+        fontSize: '1.875rem',
+        marginBottom: '0.5rem',
+        display: 'block'
+    };
+
+    const avatarNameStyle = {
+        fontSize: '0.75rem',
+        fontWeight: '500',
+        color: '#374151'
+    };
+
+    const selectedInfoStyle = {
+        fontSize: '0.875rem',
+        color: '#6b7280',
+        marginTop: '0.5rem'
+    };
+
+    const themeGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+        gap: '1rem'
+    };
+
+    const themeButtonStyle = (isSelected) => ({
+        padding: '1rem',
+        borderRadius: '0.75rem',
+        border: `2px solid ${isSelected ? '#3b82f6' : '#e5e7eb'}`,
+        backgroundColor: isSelected ? '#dbeafe' : 'white',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        textAlign: 'center',
+        fontFamily: 'inherit',
+        boxShadow: isSelected ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
+    });
+
+    const themePreviewStyle = (theme) => {
+        const colors = {
+            default: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            dark: 'linear-gradient(135deg, #374151, #1f2937)',
+            ocean: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+            forest: 'linear-gradient(135deg, #10b981, #047857)',
+            space: 'linear-gradient(135deg, #8b5cf6, #7c3aed)'
+        };
+        
+        return {
+            width: '100%',
+            height: '3rem',
+            borderRadius: '0.5rem',
+            background: colors[theme],
+            marginBottom: '0.75rem'
+        };
+    };
+
+    const themeNameStyle = {
+        fontSize: '0.875rem',
+        fontWeight: '600',
+        textTransform: 'capitalize'
+    };
+
+    const toggleButtonStyle = (isActive) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        padding: '1rem',
+        borderRadius: '0.75rem',
+        border: `2px solid ${isActive ? '#10b981' : '#e5e7eb'}`,
+        backgroundColor: isActive ? '#d1fae5' : '#f9fafb',
+        color: isActive ? '#065f46' : '#6b7280',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        fontFamily: 'inherit',
+        width: '100%',
+        textAlign: 'left'
+    });
+
+    const toggleIconStyle = (isActive) => ({
+        width: '2rem',
+        height: '2rem',
+        borderRadius: '0.5rem',
+        backgroundColor: isActive ? '#10b981' : '#9ca3af',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '1.125rem'
+    });
+
+    const toggleTextStyle = {
+        flex: 1
+    };
+
+    const toggleTitleStyle = {
+        fontWeight: '500',
+        marginBottom: '0.25rem'
+    };
+
+    const toggleDescStyle = {
+        fontSize: '0.875rem',
+        opacity: 0.75
+    };
+
+    const soundTestGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '0.75rem',
+        marginTop: '1rem',
+        paddingTop: '1rem',
+        borderTop: '1px solid #e5e7eb'
+    };
+
+    const soundTestButtonStyle = {
+        padding: '0.75rem',
+        borderRadius: '0.5rem',
+        border: 'none',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        fontSize: '0.875rem',
+        fontWeight: '500',
+        transition: 'all 0.2s ease'
+    };
+
+    const difficultyGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '1rem'
+    };
+
+    const difficultyButtonStyle = (isSelected) => ({
+        padding: '1rem',
+        borderRadius: '0.75rem',
+        border: `2px solid ${isSelected ? '#3b82f6' : '#e5e7eb'}`,
+        backgroundColor: isSelected ? '#dbeafe' : 'white',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        textAlign: 'center',
+        fontFamily: 'inherit',
+        boxShadow: isSelected ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
+    });
+
+    const difficultyEmojiStyle = {
+        fontSize: '1.875rem',
+        marginBottom: '0.5rem'
+    };
+
+    const difficultyNameStyle = {
+        fontWeight: '600',
+        marginBottom: '0.25rem'
+    };
+
+    const difficultyDescStyle = {
+        fontSize: '0.75rem',
+        color: '#6b7280'
+    };
+
+    const saveButtonStyle = {
+        background: 'linear-gradient(135deg, #10b981, #047857)',
+        color: 'white',
+        border: 'none',
+        padding: '1rem 2rem',
+        borderRadius: '0.75rem',
+        fontSize: '1.125rem',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
+        fontFamily: 'inherit',
+        width: '100%',
+        maxWidth: '300px',
+        margin: '0 auto',
+        display: 'block'
+    };
+
     const handleSave = () => {
         const newPreferences = {
             theme: selectedTheme,
@@ -54,27 +308,29 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div style={containerStyle}>
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div style={headerStyle}>
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-800">⚙️ Postavke</h2>
-                    <p className="text-gray-600">Personaliziraj svoju igru, {playerName}</p>
+                    <h2 style={titleStyle}>⚙️ Postavke</h2>
+                    <p style={subtitleStyle}>Personaliziraj svoju igru, {playerName}</p>
                 </div>
                 <button 
                     onClick={() => setGameState(GAME_STATES.MENU)}
-                    className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                    style={backButtonStyle}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#4b5563'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
                 >
                     ← Povratak
                 </button>
             </div>
 
             {/* Avatar Selection */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div style={sectionStyle}>
+                <h3 style={sectionTitleStyle}>
                     👤 Odaberi avatar
                 </h3>
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                <div style={avatarGridStyle}>
                     {AVATARS.map(avatar => (
                         <button
                             key={avatar.id}
@@ -82,120 +338,147 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
                                 setSelectedAvatar(avatar.id);
                                 previewSound('click');
                             }}
-                            className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                                selectedAvatar === avatar.id 
-                                    ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                            }`}
+                            style={avatarButtonStyle(selectedAvatar === avatar.id)}
+                            onMouseOver={(e) => {
+                                if (selectedAvatar !== avatar.id) {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                                }
+                            }}
+                            onMouseOut={(e) => {
+                                if (selectedAvatar !== avatar.id) {
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                                }
+                            }}
                         >
-                            <div className="text-3xl mb-2">{avatar.emoji}</div>
-                            <div className="text-xs font-medium text-gray-700">{avatar.name}</div>
+                            <span style={avatarEmojiStyle}>{avatar.emoji}</span>
+                            <div style={avatarNameStyle}>{avatar.name}</div>
                         </button>
                     ))}
                 </div>
-                <div className="mt-4 text-sm text-gray-600">
+                <div style={selectedInfoStyle}>
                     Odabrani avatar: <strong>{AVATARS.find(a => a.id === selectedAvatar)?.name}</strong> {AVATARS.find(a => a.id === selectedAvatar)?.emoji}
                 </div>
             </div>
 
             {/* Theme Selection */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div style={sectionStyle}>
+                <h3 style={sectionTitleStyle}>
                     🎨 Odaberi temu
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {Object.values(THEMES).map(theme => {
-                        const themeColors = {
-                            default: 'bg-gradient-to-br from-blue-400 to-blue-600',
-                            dark: 'bg-gradient-to-br from-gray-700 to-gray-900',
-                            ocean: 'bg-gradient-to-br from-cyan-400 to-blue-500',
-                            forest: 'bg-gradient-to-br from-green-400 to-emerald-600',
-                            space: 'bg-gradient-to-br from-purple-500 to-indigo-700'
-                        };
-
-                        return (
-                            <button
-                                key={theme}
-                                onClick={() => handleThemeChange(theme)}
-                                className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                                    selectedTheme === theme 
-                                        ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                                        : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                            >
-                                <div className={`w-full h-12 rounded-lg ${themeColors[theme]} mb-3`}></div>
-                                <div className="font-semibold text-sm capitalize">
-                                    {ThemeManager.getThemeDisplayName(theme)}
-                                </div>
-                            </button>
-                        );
-                    })}
+                <div style={themeGridStyle}>
+                    {Object.values(THEMES).map(theme => (
+                        <button
+                            key={theme}
+                            onClick={() => handleThemeChange(theme)}
+                            style={themeButtonStyle(selectedTheme === theme)}
+                            onMouseOver={(e) => {
+                                if (selectedTheme !== theme) {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                                }
+                            }}
+                            onMouseOut={(e) => {
+                                if (selectedTheme !== theme) {
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                                }
+                            }}
+                        >
+                            <div style={themePreviewStyle(theme)}></div>
+                            <div style={themeNameStyle}>
+                                {ThemeManager.getThemeDisplayName(theme)}
+                            </div>
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Sound Settings */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div style={sectionStyle}>
+                <h3 style={sectionTitleStyle}>
                     🔊 Zvučni efekti
                 </h3>
-                <div className="space-y-4">
+                <div style={{ marginBottom: '1rem' }}>
                     <button
                         onClick={handleSoundToggle}
-                        className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all w-full md:w-auto ${
-                            soundEnabled 
-                                ? 'border-green-500 bg-green-50 text-green-800' 
-                                : 'border-gray-300 bg-gray-50 text-gray-600'
-                        }`}
+                        style={toggleButtonStyle(soundEnabled)}
                     >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            soundEnabled ? 'bg-green-500' : 'bg-gray-400'
-                        }`}>
-                            <span className="text-white text-lg">
-                                {soundEnabled ? '🔊' : '🔇'}
-                            </span>
+                        <div style={toggleIconStyle(soundEnabled)}>
+                            {soundEnabled ? '🔊' : '🔇'}
                         </div>
-                        <span className="font-medium">
-                            {soundEnabled ? 'Zvuk uključen' : 'Zvuk isključen'}
-                        </span>
+                        <div style={toggleTextStyle}>
+                            <div style={toggleTitleStyle}>
+                                {soundEnabled ? 'Zvuk uključen' : 'Zvuk isključen'}
+                            </div>
+                            <div style={toggleDescStyle}>
+                                {soundEnabled ? 'Korisni zvučni efekti tijekom igre' : 'Tiha igra bez zvukova'}
+                            </div>
+                        </div>
                     </button>
-
-                    {soundEnabled && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t">
-                            <button
-                                onClick={() => previewSound('correct')}
-                                className="p-3 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
-                            >
-                                ✅ Točan odgovor
-                            </button>
-                            <button
-                                onClick={() => previewSound('wrong')}
-                                className="p-3 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
-                            >
-                                ❌ Netočan odgovor
-                            </button>
-                            <button
-                                onClick={() => previewSound('levelUp')}
-                                className="p-3 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
-                            >
-                                🎉 Novi nivo
-                            </button>
-                            <button
-                                onClick={() => previewSound('achievement')}
-                                className="p-3 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium"
-                            >
-                                🏆 Postignuće
-                            </button>
-                        </div>
-                    )}
                 </div>
+
+                {soundEnabled && (
+                    <div style={soundTestGridStyle}>
+                        <button
+                            onClick={() => previewSound('correct')}
+                            style={{
+                                ...soundTestButtonStyle,
+                                backgroundColor: '#d1fae5',
+                                color: '#065f46'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#a7f3d0'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#d1fae5'}
+                        >
+                            ✅ Točan odgovor
+                        </button>
+                        <button
+                            onClick={() => previewSound('wrong')}
+                            style={{
+                                ...soundTestButtonStyle,
+                                backgroundColor: '#fee2e2',
+                                color: '#991b1b'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#fecaca'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#fee2e2'}
+                        >
+                            ❌ Netočan odgovor
+                        </button>
+                        <button
+                            onClick={() => previewSound('levelUp')}
+                            style={{
+                                ...soundTestButtonStyle,
+                                backgroundColor: '#dbeafe',
+                                color: '#1e40af'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#bfdbfe'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#dbeafe'}
+                        >
+                            🎉 Novi nivo
+                        </button>
+                        <button
+                            onClick={() => previewSound('achievement')}
+                            style={{
+                                ...soundTestButtonStyle,
+                                backgroundColor: '#e9d5ff',
+                                color: '#6b21a8'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#ddd6fe'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#e9d5ff'}
+                        >
+                            🏆 Postignuće
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Difficulty Settings */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div style={sectionStyle}>
+                <h3 style={sectionTitleStyle}>
                     🎯 Težina igre
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div style={difficultyGridStyle}>
                     {Object.values(DIFFICULTY_LEVELS).map(difficulty => {
                         const difficultyInfo = {
                             easy: { emoji: '😊', description: 'Više vremena, lakši brojevi' },
@@ -210,17 +493,25 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
                                     setSelectedDifficulty(difficulty);
                                     previewSound('click');
                                 }}
-                                className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                                    selectedDifficulty === difficulty 
-                                        ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                }`}
+                                style={difficultyButtonStyle(selectedDifficulty === difficulty)}
+                                onMouseOver={(e) => {
+                                    if (selectedDifficulty !== difficulty) {
+                                        e.target.style.transform = 'translateY(-2px)';
+                                        e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                                    }
+                                }}
+                                onMouseOut={(e) => {
+                                    if (selectedDifficulty !== difficulty) {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                                    }
+                                }}
                             >
-                                <div className="text-3xl mb-2">{difficultyInfo[difficulty].emoji}</div>
-                                <div className="font-semibold mb-1 capitalize">
+                                <div style={difficultyEmojiStyle}>{difficultyInfo[difficulty].emoji}</div>
+                                <div style={difficultyNameStyle}>
                                     {ThemeManager.getDifficultyDisplayName(difficulty)}
                                 </div>
-                                <div className="text-xs text-gray-600">
+                                <div style={difficultyDescStyle}>
                                     {difficultyInfo[difficulty].description}
                                 </div>
                             </button>
@@ -230,8 +521,8 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
             </div>
 
             {/* Tips Settings */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div style={sectionStyle}>
+                <h3 style={sectionTitleStyle}>
                     💡 Matematički savjeti
                 </h3>
                 <button
@@ -239,24 +530,16 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
                         setShowTips(!showTips);
                         previewSound('click');
                     }}
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                        showTips 
-                            ? 'border-yellow-500 bg-yellow-50 text-yellow-800' 
-                            : 'border-gray-300 bg-gray-50 text-gray-600'
-                    }`}
+                    style={toggleButtonStyle(showTips)}
                 >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        showTips ? 'bg-yellow-500' : 'bg-gray-400'
-                    }`}>
-                        <span className="text-white text-lg">
-                            {showTips ? '💡' : '❌'}
-                        </span>
+                    <div style={toggleIconStyle(showTips)}>
+                        {showTips ? '💡' : '❌'}
                     </div>
-                    <div>
-                        <div className="font-medium">
+                    <div style={toggleTextStyle}>
+                        <div style={toggleTitleStyle}>
                             {showTips ? 'Prikaži savjete tijekom igre' : 'Sakrij savjete tijekom igre'}
                         </div>
-                        <div className="text-sm opacity-75">
+                        <div style={toggleDescStyle}>
                             {showTips ? 'Korisni savjeti će ti pomagati učiti' : 'Fokus samo na pitanja'}
                         </div>
                     </div>
@@ -264,10 +547,20 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
             </div>
 
             {/* Save Button */}
-            <div className="flex justify-center">
+            <div style={{ textAlign: 'center' }}>
                 <button
                     onClick={handleSave}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-8 rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all shadow-lg"
+                    style={saveButtonStyle}
+                    onMouseOver={(e) => {
+                        e.target.style.background = 'linear-gradient(135deg, #047857, #065f46)';
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.target.style.background = 'linear-gradient(135deg, #10b981, #047857)';
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.4)';
+                    }}
                 >
                     💾 Spremi postavke
                 </button>
