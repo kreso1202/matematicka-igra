@@ -1,13 +1,250 @@
 <!DOCTYPE html>
 <html lang="hr">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Matematička Igrica</title>
-  </head>
-  <body>
-    <div id="root"></div>
-   <script type="module" src="./src/main.jsx"></script>
-  </body>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Matematička igrica za učenje kroz zabavu. Riješavaj zadatke, otkrivaj postignuća i prati napredak kroz 7 progresivnih nivoa!" />
+    <meta name="keywords" content="matematika, igrica, učenje, djeca, zadaci, kviz, edukacija" />
+    <meta name="author" content="Matematička igrica" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Matematička igrica - Uči kroz zabavu!" />
+    <meta property="og:description" content="Edukacijska matematička igrica s 7 nivoa, postignućima i personalizacijom" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/src/styles/themes.css" as="style" />
+    
+    <!-- CSS Stilovi -->
+    <link rel="stylesheet" href="/src/styles/themes.css" />
+    
+    <!-- Custom CSS za smooth transitions -->
+    <style>
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Smooth page transitions */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: var(--bg-primary, #ffffff);
+            color: var(--text-primary, #1f2937);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+        
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary, #f1f1f1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color, #3b82f6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary, #6b7280);
+        }
+        
+        /* Prevent flash of unstyled content */
+        .app-root {
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.1s;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Focus styles for accessibility */
+        button:focus-visible,
+        input:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 2px solid var(--accent-color, #3b82f6);
+            outline-offset: 2px;
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8f8f8;
+                --text-primary: #000000;
+                --text-secondary: #333333;
+                --border-color: #000000;
+            }
+        }
+        
+        /* Dark mode preference */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #1a1a1a;
+                --bg-secondary: #2d2d2d;
+                --text-primary: #ffffff;
+                --text-secondary: #d1d5db;
+                --border-color: #4b5563;
+            }
+        }
+    </style>
+    
+    <title>Matematička igrica - Uči kroz zabavu!</title>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">🧮 Učitavanje matematičke igrice...</div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="root" class="app-root"></div>
+    
+    <!-- Fallback Content for No-JS -->
+    <noscript>
+        <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+            <h1>🧮 Matematička igrica</h1>
+            <p>Za korištenje ove aplikacije potreban je JavaScript.</p>
+            <p>Molimo omogućite JavaScript u vašem browseru.</p>
+        </div>
+    </noscript>
+
+    <!-- Service Worker Registration (optional) -->
+    <script>
+        // Hide loading screen when page is loaded
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 1000); // Show loading for at least 1 second
+        });
+
+        // Register Service Worker for PWA (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // Theme detection and application
+        function detectAndApplyTheme() {
+            const savedTheme = localStorage.getItem('math-game-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                document.documentElement.classList.add(`theme-${savedTheme}`);
+            } else if (prefersDark) {
+                document.documentElement.classList.add('theme-dark');
+            }
+        }
+
+        // Apply theme immediately to prevent flash
+        detectAndApplyTheme();
+
+        // Listen for theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            if (!localStorage.getItem('math-game-theme')) {
+                document.documentElement.classList.toggle('theme-dark', e.matches);
+            }
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            if ('performance' in window) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`🚀 Matematička igrica učitana za ${loadTime}ms`);
+            }
+        });
+
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('Greška u aplikaciji:', e.error);
+        });
+
+        // Unhandled promise rejection handling
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Neobrađena greška:', e.reason);
+        });
+    </script>
+    
+    <!-- React App Script -->
+    <script type="module" src="/src/main.jsx"></script>
+</body>
 </html>
