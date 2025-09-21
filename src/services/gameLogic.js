@@ -203,9 +203,18 @@ export class GameLogic {
         return Math.round((20 + timeBonus + streakBonus + levelBonus) * modeMultiplier);
     }
 
-    static getLevelProgress(questionsInLevel, currentLevel) {
+    static getLevelProgress(questionsInLevel, currentLevel, gameMode = GAME_MODES.CLASSIC) {
         const levelData = this.getCurrentLevelData(currentLevel);
-        return Math.min((questionsInLevel / levelData.questionsNeeded) * 100, 100);
+        
+        // Za specifične modove, možda treba više pitanja
+        let questionsNeeded = levelData.questionsNeeded;
+        if (gameMode === GAME_MODES.SPRINT) {
+            questionsNeeded = Math.floor(questionsNeeded * 1.5); // Više pitanja za sprint
+        } else if (gameMode === GAME_MODES.TRAINING) {
+            questionsNeeded = Math.floor(questionsNeeded * 0.8); // Manje pitanja za training
+        }
+        
+        return Math.min((questionsInLevel / questionsNeeded) * 100, 100);
     }
 
     static shouldLevelUp(questionsInLevel, currentLevel, gameMode = GAME_MODES.CLASSIC) {
