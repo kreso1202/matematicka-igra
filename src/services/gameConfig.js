@@ -182,26 +182,38 @@ export const FEEDBACK_TYPES = {
     TIMEOUT: 'timeout'
 };
 
-// Math tips and explanations
+// Math tips and explanations - prilagođeno djeci do 3. razreda
 export const MATH_TIPS = {
     multiplication: [
-        "Za množenje s 9: pomnoži s 10 pa oduzmi broj (9×7 = 70-7 = 63)",
-        "Tablice do 5×5 trebaju biti u glavi automatski!",
-        "Za množenje s 11: 11×23 = 2_3 → 2(2+3)3 = 253"
+        "Za množenje s 2: dodaj broj sam sebi (5×2 = 5+5 = 10)",
+        "Za množenje s 5: završava uvijek s 0 ili 5 (5×3 = 15, 5×4 = 20)", 
+        "Za množenje s 10: samo dodaj 0 na kraj (7×10 = 70)",
+        "Tablice do 5×5 treba znati napamet!",
+        "Množenje možeš obrnuti: 3×4 = 4×3",
+        "Za 9×broj: oduzmi 1 od broja, a ostatak je 10 minus taj broj (9×6: 6-1=5, 10-6=4, pa je 54)"
     ],
     division: [
-        "Dijeljenje je obrnut postupak množenja",
-        "Provjeri rezultat: količnik × djelitelj = dijeljenik",
-        "Koristi tablice množenja unatrag"
+        "Dijeljenje je obrnut postupak množenja", 
+        "Provjeri rezultat: pomnožiš pa vidiš jesi dobio prvi broj",
+        "Dijeljenje s 2 znači 'podijeli po pol'",
+        "Dijeljenje s 5: broj mora završavati s 0 ili 5",
+        "Za dijeljenje s 10: ukloni zadnju nulu",
+        "Ako ne ide točno, možda nisi dobro pomnožio tablice"
     ],
     addition: [
-        "Brojevi koje zbrajamo mogu se mijenjati mjestima",
-        "Lakše je zbrajati do okruglih brojeva: 27+15 = 27+3+12 = 42",
-        "Koristite prstići za manje brojeve"
+        "Brojevi se mogu mijenjati mjestima: 3+7 = 7+3",
+        "Koristi prste za manje brojeve do 10", 
+        "Za veće brojeve: 8+7 = 8+2+5 = 10+5 = 15",
+        "Zbrajaj do okruglog broja pa onda dodaj ostatak",
+        "Kad zbrajaš 9, dodaj 10 pa oduzmi 1",
+        "Brojevni pravac ti može pomoći"
     ],
     subtraction: [
-        "Oduzimanje možete provjeriti zbrajanjem",
-        "Za veće brojeve: razmislite o razlici",
-        "45-28 = 45-30+2 = 17"
+        "Provjeri odgovor zbrajanjem: 15-8=7, pa 7+8=15 ✓",
+        "Za lakše oduzimanje: 32-18 = 32-20+2 = 14", 
+        "Oduzimanje 9: oduzmi 10 pa dodaj 1",
+        "Koristi brojevni pravac za manje brojeve",
+        "Misli koliko još treba do većeg broja",
+        "Počni od manjeg broja i broji naviše"
     ]
 };
