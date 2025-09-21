@@ -204,11 +204,22 @@ function App() {
         }
     };
 
-    const generateQuestion = () => {
-        const { question, correctAnswer: answer } = GameLogic.generateQuestion(currentLevel, gameMode);
-        const levelData = GameLogic.getCurrentLevelData(currentLevel);
+    const generateQuestion = (forceGameMode = null, forceLevel = null) => {
+        const activeGameMode = forceGameMode || gameMode;
+        const activeLevel = forceLevel || currentLevel;
         
-        console.log('🎯 Generiram pitanje:', question, '= ?', answer); // Debug log
+        console.log('🎮 PRIJE generiranja:', { 
+            currentLevel: activeLevel, 
+            gameMode: activeGameMode, 
+            questionsInLevel,
+            forceGameMode,
+            forceLevel 
+        }); // Debug
+        
+        const { question, correctAnswer: answer } = GameLogic.generateQuestion(activeLevel, activeGameMode);
+        const levelData = GameLogic.getCurrentLevelData(activeLevel);
+        
+        console.log('🎯 Generiram pitanje:', question, '= ?', answer, 'Mode:', activeGameMode, 'Level:', activeLevel); // Debug log
         
         setCurrentQuestion(question);
         setCorrectAnswer(answer);
@@ -216,6 +227,8 @@ function App() {
     };
 
     const startGame = (selectedGameMode = GAME_MODES.CLASSIC) => {
+        console.log('🚀 POČINJE NOVA IGRA:', selectedGameMode); // Debug
+        
         setGameState(GAME_STATES.PLAYING);
         setGameMode(selectedGameMode);
         setScore(0);
@@ -231,9 +244,12 @@ function App() {
         setSessionStats({ correct: 0, wrong: 0, timeouts: 0 });
         setGameStartTime(Date.now());
         
+        console.log('⏳ Čekam 100ms prije generiranja pitanja...'); // Debug
+        
         // Dodaj timeout da se state resetira prije generiranja pitanja
         setTimeout(() => {
-            generateQuestion();
+            console.log('✨ Generiram prvo pitanje za mode:', selectedGameMode); // Debug
+            generateQuestion(selectedGameMode, 1); // Eksplicitno proslijedi mode i level
             GameLogic.focusInput(300);
         }, 100);
     };
@@ -253,7 +269,7 @@ function App() {
         ThemeManager.playSound('levelUp', soundEnabled);
         
         setTimeout(() => {
-            generateQuestion();
+            generateQuestion(null, currentLevel + 1); // Koristi trenutni gameMode, ali eksplicitni level
             GameLogic.focusInput(200);
         }, 100);
     };
