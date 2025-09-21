@@ -151,4 +151,13 @@ export class ThemeManager {
         };
         return displayNames[difficultyKey] || difficultyKey;
     }
+
+    static getDifficultyDescription(difficultyKey) {
+        const descriptions = {
+            easy: 'Manji brojevi, prikladni za početnici. Zbrajanje do 20, tablice do 3.',
+            medium: 'Standardni brojevi za uzrast 1.-3. razreda. Zbrajanje do 50, tablice do 6.',
+            hard: 'Veći izazov s više bodova. Zbrajanje do 100, tablice do 10.'
+        };
+        return descriptions[difficultyKey] || 'Standardna težina';
+    }
 }
