@@ -1,94 +1,189 @@
 import { ACHIEVEMENTS } from './gameConfig.js';
 
 export class AchievementManager {
-    static checkAchievements(playerData, sessionStats, gameTime, streak) {
-        const achievements = playerData.statistics?.achievements || { unlocked: [], progress: {} };
+    static checkAchievements(playerData, sessionStats, gameTime, maxStreak) {
+        const currentAchievements = playerData.statistics?.achievements?.unlocked || [];
         const newUnlocked = [];
-
-        // First Win
-        if (!achievements.unlocked.includes('first_win') && playerData.gamesPlayed >= 1) {
-            newUnlocked.push('first_win');
+        const updatedProgress = { ...playerData.statistics?.achievements?.progress || {} };
+        
+        // Check each achievement
+        Object.values(ACHIEVEMENTS).forEach(achievement => {
+            if (!currentAchievements.includes(achievement.id)) {
+                const result = this.isAchievementUnlocked(achievement.id, playerData, sessionStats, { gameTime, maxStreak });
+                if (result.unlocked) {
+                    newUnlocked.push(achievement.id);
+                } else if (result.progress) {
+                    updatedProgress[achievement.id] = result.progress;
+                }
+            }
+        });
+        
+        return {
+            newUnlocked,
+            unlocked: [...currentAchievements, ...newUnlocked],
+            progress: updatedProgress
+        };
+    }
+    
+    static isAchievementUnlocked(achievementId, playerData, sessionStats, gameResults) {
+        const stats = playerData.statistics || {};
+        
+        switch (achievementId) {
+            case 'first_win':
+                return {
+                    unlocked: playerData.gamesPlayed >= 1,
+                    progress: null
+                };
+                
+            case 'perfect_level':
+                const isPerfect = sessionStats.wrong === 0 && sessionStats.timeouts === 0 && sessionStats.correct > 0;
+                return {
+                    unlocked: isPerfect,
+                    progress: null
+                };
+                
+            case 'streak_10':
+                const hasStreak10 = gameResults.maxStreak >= 10;
+                return {
+                    unlocked: hasStreak10,
+                    progress: hasStreak10 ? null : {
+                        current: gameResults.maxStreak || 0,
+                        target: 10
+                    }
+                };
+                
+            case 'speed_demon':
+                // Since we don't track fastestAnswer yet, return false for now
+                // TODO: Implement fastestAnswer tracking in PlayerManager
+                return {
+                    unlocked: false,
+                    progress: {
+                        current: 0,
+                        target: 1
+                    }
+                };
+                
+            case 'math_master':
+                const hasMathMaster = playerData.maxLevel >= 7;
+                return {
+                    unlocked: hasMathMaster,
+                    progress: hasMathMaster ? null : {
+                        current: playerData.maxLevel || 1,
+                        target: 7
+                    }
+                };
+                
+            case 'hundred_questions':
+                const totalQuestions = stats.totalQuestionsAnswered || 0;
+                const hasHundred = totalQuestions >= 100;
+                return {
+                    unlocked: hasHundred,
+                    progress: hasHundred ? null : {
+                        current: totalQuestions,
+                        target: 100
+                    }
+                };
+                
+            case 'week_streak':
+                const hasWeekStreak = this.checkWeekStreak(stats.dailyStats);
+                const consecutiveDays = this.getConsecutiveDays(stats.dailyStats);
+                return {
+                    unlocked: hasWeekStreak,
+                    progress: hasWeekStreak ? null : {
+                        current: consecutiveDays,
+                        target: 7
+                    }
+                };
+                
+            default:
+                return {
+                    unlocked: false,
+                    progress: null
+                };
         }
-
-        // Perfect Level
-        if (!achievements.unlocked.includes('perfect_level') && 
-            sessionStats.wrong === 0 && sessionStats.timeouts === 0 && sessionStats.correct > 0) {
-            newUnlocked.push('perfect_level');
-        }
-
-        // Streak 10
-        if (!achievements.unlocked.includes('streak_10') && streak >= 10) {
-            newUnlocked.push('streak_10');
-        }
-
-        // Speed Demon - prosječno vrijeme po pitanju manje od 3 sekunde
-        if (!achievements.unlocked.includes('speed_demon') && 
-            sessionStats.correct > 0 && (gameTime / sessionStats.correct) < 3) {
-            newUnlocked.push('speed_demon');
-        }
-
-        // Math Master
-        if (!achievements.unlocked.includes('math_master') && playerData.maxLevel >= 7) {
-            newUnlocked.push('math_master');
-        }
-
-        // Hundred Questions
-        const totalQuestions = playerData.statistics?.totalQuestionsAnswered || 0;
-        if (!achievements.unlocked.includes('hundred_questions') && totalQuestions >= 100) {
-            newUnlocked.push('hundred_questions');
-        }
-
-        // Week Streak - igrao zadnjih 7 dana
-        if (!achievements.unlocked.includes('week_streak')) {
-            const dailyStats = playerData.statistics?.dailyStats || {};
-            const last7Days = this.getLast7Days();
-            const streakDays = last7Days.every(date => dailyStats[date]?.gamesPlayed > 0);
-            if (streakDays) {
-                newUnlocked.push('week_streak');
+    }
+    
+    static checkWeekStreak(dailyStats) {
+        if (!dailyStats) return false;
+        
+        const today = new Date();
+        let consecutiveDays = 0;
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toDateString();
+            
+            if (dailyStats[dateStr] && dailyStats[dateStr].gamesPlayed > 0) {
+                consecutiveDays++;
+            } else {
+                break;
             }
         }
-
-        // Ažurirati progress za achievements koji nisu unlocked
-        const updatedProgress = { ...achievements.progress };
         
-        if (!achievements.unlocked.includes('streak_10')) {
-            updatedProgress.streak_10 = { current: Math.min(streak, 10), target: 10 };
-        }
-        
-        if (!achievements.unlocked.includes('hundred_questions')) {
-            updatedProgress.hundred_questions = { current: Math.min(totalQuestions, 100), target: 100 };
-        }
-
-        return {
-            unlocked: [...achievements.unlocked, ...newUnlocked],
-            progress: updatedProgress,
-            newUnlocked
-        };
+        return consecutiveDays >= 7;
     }
-
-    static getLast7Days() {
-        const days = [];
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date();
+    
+    static getConsecutiveDays(dailyStats) {
+        if (!dailyStats) return 0;
+        
+        const today = new Date();
+        let consecutiveDays = 0;
+        
+        for (let i = 0; i < 30; i++) {
+            const date = new Date(today);
             date.setDate(date.getDate() - i);
-            days.push(date.toDateString());
+            const dateStr = date.toDateString();
+            
+            if (dailyStats[dateStr] && dailyStats[dateStr].gamesPlayed > 0) {
+                consecutiveDays++;
+            } else {
+                break;
+            }
         }
-        return days;
+        
+        return consecutiveDays;
     }
-
+    
+    static getAchievementProgress(achievementId, playerData) {
+        const stats = playerData.statistics || {};
+        
+        switch (achievementId) {
+            case 'hundred_questions':
+                const totalQuestions = stats.totalQuestionsAnswered || 0;
+                return Math.min((totalQuestions / 100) * 100, 100);
+                
+            case 'math_master':
+                const currentLevel = playerData.maxLevel || 1;
+                return Math.min((currentLevel / 7) * 100, 100);
+                
+            case 'week_streak':
+                const consecutiveDays = this.getConsecutiveDays(stats.dailyStats);
+                return Math.min((consecutiveDays / 7) * 100, 100);
+                
+            case 'streak_10':
+                const bestStreak = stats.bestStreak || 0;
+                return Math.min((bestStreak / 10) * 100, 100);
+                
+            default:
+                return 0;
+        }
+    }
+    
+    // NEW: Missing function that AchievementsScreen tries to call
     static getAchievementData(achievementId) {
-        return ACHIEVEMENTS[achievementId.toUpperCase()];
+        return ACHIEVEMENTS[achievementId.toUpperCase()] || null;
     }
-
-    static formatAchievementNotification(achievementId) {
-        const achievement = this.getAchievementData(achievementId);
-        if (!achievement) return null;
-
-        return {
-            id: achievementId,
-            title: achievement.name,
-            description: achievement.description,
-            emoji: achievement.emoji
-        };
+    
+    // NEW: Get all achievements with their unlock status
+    static getAllAchievementsWithStatus(playerData) {
+        const currentAchievements = playerData.statistics?.achievements?.unlocked || [];
+        const progress = playerData.statistics?.achievements?.progress || {};
+        
+        return Object.values(ACHIEVEMENTS).map(achievement => ({
+            ...achievement,
+            isUnlocked: currentAchievements.includes(achievement.id),
+            progress: progress[achievement.id] || null
+        }));
     }
 }
