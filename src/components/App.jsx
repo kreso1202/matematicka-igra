@@ -205,7 +205,7 @@ function App() {
     };
 
     const generateQuestion = () => {
-        const { question, correctAnswer: answer } = GameLogic.generateQuestion(currentLevel);
+        const { question, correctAnswer: answer } = GameLogic.generateQuestion(currentLevel, gameMode);
         const levelData = GameLogic.getCurrentLevelData(currentLevel);
         
         setCurrentQuestion(question);
@@ -261,7 +261,7 @@ function App() {
     };
 
     const handleCorrectAnswer = () => {
-        const points = GameLogic.calculateScore(timeLeft, streak, currentLevel);
+        const points = GameLogic.calculateScore(timeLeft, streak, currentLevel, gameMode);
         
         setScore(score + points);
         setStreak(streak + 1);
@@ -280,7 +280,7 @@ function App() {
             setAnswer('');
             setShowFeedback('');
             
-            if (GameLogic.shouldLevelUp(questionsInLevel + 1, currentLevel)) {
+            if (GameLogic.shouldLevelUp(questionsInLevel + 1, currentLevel, gameMode)) {
                 if (!GameLogic.isGameComplete(currentLevel)) {
                     setGameState(GAME_STATES.LEVEL_COMPLETE);
                 } else {
@@ -365,7 +365,8 @@ function App() {
             score, 
             currentLevel, 
             sessionStatsWithStreak,
-            gameTime
+            gameTime,
+            gameMode
         );
 
         // Provjeri achievements
@@ -445,7 +446,7 @@ function App() {
 
     const getAllPlayers = () => PlayerManager.getAllPlayers(localData, cloudData, isJsonBinConfigured());
     const getTopPlayers = () => PlayerManager.getTopPlayers(localData, cloudData, isJsonBinConfigured());
-    const getLevelProgress = () => GameLogic.getLevelProgress(questionsInLevel, currentLevel);
+    const getLevelProgress = () => GameLogic.getLevelProgress(questionsInLevel, currentLevel, gameMode);
     const exportResults = () => LocalStorage.exportData();
 
     const refreshCloudData = async () => {
