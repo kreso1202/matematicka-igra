@@ -103,26 +103,10 @@ const appStyles = `
     padding: 1rem;
   }
 
-  .game-card {
-    max-width: 72rem;
-    margin: 0 auto;
-    background: var(--bg-card);
-    border-radius: 1rem;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px var(--shadow);
-    padding: 2rem;
-    transition: all 0.3s ease;
-  }
-
   /* Responsive Design */
   @media (max-width: 768px) {
     .game-container {
       padding: 0.5rem;
-    }
-    
-    .game-card {
-      padding: 1rem;
-      border-radius: 0.5rem;
     }
   }
 `;
@@ -569,7 +553,18 @@ function App() {
             background: 'var(--bg-primary, #ffffff)',
             color: 'var(--text-primary, #1f2937)'
         }}>
-            <div className="game-card">
+            <div className="game-card" style={{
+                maxWidth: gameState === GAME_STATES.WELCOME ? '500px' : 
+                          gameState === GAME_STATES.PLAYING ? '700px' : '1200px',
+                margin: '0 auto',
+                background: 'var(--bg-card, #ffffff)',
+                borderRadius: '1rem',
+                border: '1px solid var(--border-color, #d1d5db)',
+                boxShadow: '0 10px 25px var(--shadow, rgba(0,0,0,0.1))',
+                padding: gameState === GAME_STATES.WELCOME ? '2rem' : 
+                        gameState === GAME_STATES.PLAYING ? '1rem' : '2rem',
+                transition: 'all 0.3s ease'
+            }}>
                 {isJsonBinConfigured() && (
                     <CloudStatus 
                         isOnline={isOnline}
