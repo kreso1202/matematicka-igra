@@ -481,9 +481,21 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
                 <div style={difficultyGridStyle}>
                     {Object.values(DIFFICULTY_LEVELS).map(difficulty => {
                         const difficultyInfo = {
-                            easy: { emoji: '😊', description: 'Više vremena, lakši brojevi' },
-                            medium: { emoji: '🤔', description: 'Uravnotežena igra' },
-                            hard: { emoji: '😤', description: 'Manje vremena, teži brojevi' }
+                            easy: { 
+                                emoji: '😊', 
+                                description: 'Manji brojevi, lakše tablice',
+                                details: 'Zbrajanje do 20, tablice do 3x3'
+                            },
+                            medium: { 
+                                emoji: '🤔', 
+                                description: 'Standardni brojevi za tvoj uzrast',
+                                details: 'Zbrajanje do 50, tablice do 6x6'
+                            },
+                            hard: { 
+                                emoji: '😤', 
+                                description: 'Veći izazov, više bodova',
+                                details: 'Zbrajanje do 100, tablice do 10x10'
+                            }
                         };
 
                         return (
@@ -513,6 +525,14 @@ function SettingsScreen({ playerName, getAllPlayers, setGameState, updatePlayerP
                                 </div>
                                 <div style={difficultyDescStyle}>
                                     {difficultyInfo[difficulty].description}
+                                </div>
+                                <div style={{
+                                    fontSize: '0.625rem',
+                                    color: '#9ca3af',
+                                    marginTop: '0.25rem',
+                                    fontStyle: 'italic'
+                                }}>
+                                    {difficultyInfo[difficulty].details}
                                 </div>
                             </button>
                         );
