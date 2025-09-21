@@ -1,4 +1,4 @@
-import { LEVELS, GAME_MODES } from './gameConfig.js';
+import { LEVELS, GAME_MODES, MATH_TIPS } from './gameConfig.js';
 
 export class GameLogic {
     static getCurrentLevelData(currentLevel) {
@@ -392,6 +392,50 @@ export class GameLogic {
                 input.select();
             }
         }, delay);
+    }
+
+    static getMathTip(operation, gameMode) {
+        // Mapiranje operacija na tip kategorije
+        const operationMap = {
+            '+': 'addition',
+            '-': 'subtraction', 
+            '×': 'multiplication',
+            '÷': 'division'
+        };
+
+        // Za game modove, koristi specifičnu kategoriju
+        let category;
+        switch (gameMode) {
+            case GAME_MODES.ADDITION:
+                category = 'addition';
+                break;
+            case GAME_MODES.SUBTRACTION:
+                category = 'subtraction';
+                break;
+            case GAME_MODES.MULTIPLICATION:
+                category = 'multiplication';
+                break;
+            case GAME_MODES.DIVISION:
+                category = 'division';
+                break;
+            default:
+                // Za classic/training/sprint, koristi operaciju iz pitanja
+                category = operationMap[operation] || 'addition';
+        }
+
+        const tips = MATH_TIPS[category];
+        if (!tips || tips.length === 0) return null;
+
+        // Vrati random savjet iz kategorije
+        return tips[Math.floor(Math.random() * tips.length)];
+    }
+
+    static getOperationFromQuestion(question) {
+        if (question.includes(' + ')) return '+';
+        if (question.includes(' - ')) return '-';
+        if (question.includes(' × ')) return '×';
+        if (question.includes(' ÷ ')) return '÷';
+        return '+'; // fallback
     }
 
     static getGameModeDisplayName(gameMode) {
