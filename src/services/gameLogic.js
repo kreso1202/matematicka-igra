@@ -5,7 +5,7 @@ export class GameLogic {
         return LEVELS.find(l => l.id === currentLevel);
     }
 
-    static generateQuestion(currentLevel, gameMode = GAME_MODES.CLASSIC) {
+    static generateQuestion(currentLevel, gameMode = GAME_MODES.CLASSIC, difficulty = 'medium') {
         const levelData = this.getCurrentLevelData(currentLevel);
         let operations, operation;
         let num1, num2, result, question;
@@ -54,58 +54,24 @@ export class GameLogic {
             operation = operations[Math.floor(Math.random() * operations.length)];
         }
 
-        // Generiraj brojeve na temelju operacije i mode-a
+        // Generiraj brojeve na temelju operacije, mode-a i DIFFICULTY
         switch (operation) {
             case '+':
                 if (gameMode === GAME_MODES.ADDITION) {
-                    // POBOLJŠANA Addition mode progresija
-                    switch (currentLevel) {
-                        case 1:
-                            num1 = Math.floor(Math.random() * 10) + 1;      // 1-10
-                            num2 = Math.floor(Math.random() * 10) + 1;      // 1-10
-                            break;
-                        case 2:
-                            num1 = Math.floor(Math.random() * 20) + 1;      // 1-20
-                            num2 = Math.floor(Math.random() * 20) + 1;      // 1-20
-                            break;
-                        case 3:
-                            num1 = Math.floor(Math.random() * 35) + 15;     // 15-50
-                            num2 = Math.floor(Math.random() * 35) + 15;     // 15-50
-                            break;
-                        case 4:
-                            num1 = Math.floor(Math.random() * 50) + 25;     // 25-75
-                            num2 = Math.floor(Math.random() * 50) + 25;     // 25-75
-                            break;
-                        case 5:
-                            num1 = Math.floor(Math.random() * 75) + 50;     // 50-125
-                            num2 = Math.floor(Math.random() * 75) + 50;     // 50-125
-                            break;
-                        case 6:
-                            num1 = Math.floor(Math.random() * 100) + 75;    // 75-175
-                            num2 = Math.floor(Math.random() * 100) + 75;    // 75-175
-                            break;
-                        case 7:
-                            num1 = Math.floor(Math.random() * 150) + 100;   // 100-250
-                            num2 = Math.floor(Math.random() * 150) + 100;   // 100-250
-                            break;
-                        default:
-                            num1 = Math.floor(Math.random() * 200) + 150;   // 150-350
-                            num2 = Math.floor(Math.random() * 200) + 150;   // 150-350
-                    }
+                    // POBOLJŠANA Addition mode - prilagođeno djeci do 3. razreda
+                    const ranges = this.getAdditionRanges(currentLevel, difficulty);
+                    num1 = Math.floor(Math.random() * ranges.max) + ranges.min;
+                    num2 = Math.floor(Math.random() * ranges.max) + ranges.min;
                 } else if (gameMode === GAME_MODES.SPRINT) {
-                    // Sprint mode - lakši brojevi za brzinu
-                    num1 = Math.floor(Math.random() * (15 + currentLevel * 5)) + 1;
-                    num2 = Math.floor(Math.random() * (15 + currentLevel * 5)) + 1;
+                    // Sprint mode - brži, lakši brojevi
+                    const ranges = this.getAdditionRanges(Math.min(currentLevel, 4), difficulty);
+                    num1 = Math.floor(Math.random() * ranges.max) + ranges.min;
+                    num2 = Math.floor(Math.random() * ranges.max) + ranges.min;
                 } else {
-                    // Classic/Training mode - umjereno progresivno
-                    if (levelData.id <= 2) {
-                        num1 = Math.floor(Math.random() * levelData.maxNum) + 1;
-                        num2 = Math.floor(Math.random() * levelData.maxNum) + 1;
-                    } else {
-                        const range = Math.min(20 + (currentLevel * 10), 100);
-                        num1 = Math.floor(Math.random() * range) + 1;
-                        num2 = Math.floor(Math.random() * range) + 1;
-                    }
+                    // Classic/Training mode
+                    const ranges = this.getAdditionRanges(currentLevel, difficulty);
+                    num1 = Math.floor(Math.random() * ranges.max) + ranges.min;
+                    num2 = Math.floor(Math.random() * ranges.max) + ranges.min;
                 }
                 result = num1 + num2;
                 question = `${num1} + ${num2}`;
@@ -113,55 +79,22 @@ export class GameLogic {
                 
             case '-':
                 if (gameMode === GAME_MODES.SUBTRACTION) {
-                    // POBOLJŠANA Subtraction mode progresija
-                    switch (currentLevel) {
-                        case 1:
-                            num1 = Math.floor(Math.random() * 15) + 10;     // 10-25
-                            num2 = Math.floor(Math.random() * (num1 - 5)) + 1; // rezultat 1-20
-                            break;
-                        case 2:
-                            num1 = Math.floor(Math.random() * 30) + 20;     // 20-50
-                            num2 = Math.floor(Math.random() * (num1 - 10)) + 1; // rezultat 1-40
-                            break;
-                        case 3:
-                            num1 = Math.floor(Math.random() * 50) + 40;     // 40-90
-                            num2 = Math.floor(Math.random() * (num1 - 15)) + 1; // rezultat 1-75
-                            break;
-                        case 4:
-                            num1 = Math.floor(Math.random() * 75) + 75;     // 75-150
-                            num2 = Math.floor(Math.random() * (num1 - 25)) + 1; // rezultat 1-125
-                            break;
-                        case 5:
-                            num1 = Math.floor(Math.random() * 100) + 125;   // 125-225
-                            num2 = Math.floor(Math.random() * (num1 - 50)) + 1; // rezultat 1-175
-                            break;
-                        case 6:
-                            num1 = Math.floor(Math.random() * 150) + 200;   // 200-350
-                            num2 = Math.floor(Math.random() * (num1 - 75)) + 1; // rezultat 1-275
-                            break;
-                        case 7:
-                            num1 = Math.floor(Math.random() * 200) + 300;   // 300-500
-                            num2 = Math.floor(Math.random() * (num1 - 100)) + 1; // rezultat 1-400
-                            break;
-                        default:
-                            num1 = Math.floor(Math.random() * 300) + 400;   // 400-700
-                            num2 = Math.floor(Math.random() * (num1 - 150)) + 1; // rezultat 1-550
-                    }
+                    // POBOLJŠANA Subtraction mode - prilagođeno djeci
+                    const ranges = this.getSubtractionRanges(currentLevel, difficulty);
+                    num1 = Math.floor(Math.random() * (ranges.maxFirst - ranges.minFirst)) + ranges.minFirst;
+                    const maxSecond = Math.min(num1 - 1, ranges.maxSecond);
+                    num2 = Math.floor(Math.random() * maxSecond) + 1;
                 } else if (gameMode === GAME_MODES.SPRINT) {
-                    // Sprint mode
-                    const maxNum = 25 + (currentLevel * 10);
-                    num1 = Math.floor(Math.random() * maxNum) + 15;
-                    num2 = Math.floor(Math.random() * (num1 - 5)) + 1;
+                    const ranges = this.getSubtractionRanges(Math.min(currentLevel, 4), difficulty);
+                    num1 = Math.floor(Math.random() * (ranges.maxFirst - ranges.minFirst)) + ranges.minFirst;
+                    const maxSecond = Math.min(num1 - 1, ranges.maxSecond);
+                    num2 = Math.floor(Math.random() * maxSecond) + 1;
                 } else {
                     // Classic/Training mode
-                    if (levelData.id <= 2) {
-                        num1 = Math.floor(Math.random() * levelData.maxNum) + 10;
-                        num2 = Math.floor(Math.random() * num1) + 1;
-                    } else {
-                        const range = Math.min(30 + (currentLevel * 15), 150);
-                        num1 = Math.floor(Math.random() * range) + 20;
-                        num2 = Math.floor(Math.random() * (num1 - 10)) + 1;
-                    }
+                    const ranges = this.getSubtractionRanges(currentLevel, difficulty);
+                    num1 = Math.floor(Math.random() * (ranges.maxFirst - ranges.minFirst)) + ranges.minFirst;
+                    const maxSecond = Math.min(num1 - 1, ranges.maxSecond);
+                    num2 = Math.floor(Math.random() * maxSecond) + 1;
                 }
                 result = num1 - num2;
                 question = `${num1} - ${num2}`;
@@ -169,58 +102,19 @@ export class GameLogic {
                 
             case '×':
                 if (gameMode === GAME_MODES.MULTIPLICATION) {
-                    // POBOLJŠANA Multiplication mode progresija
-                    switch (currentLevel) {
-                        case 1:
-                            // Tablice 1-3
-                            num1 = Math.floor(Math.random() * 3) + 1;       // 1-3
-                            num2 = Math.floor(Math.random() * 10) + 1;      // 1-10
-                            break;
-                        case 2:
-                            // Tablice 1-5
-                            num1 = Math.floor(Math.random() * 5) + 1;       // 1-5
-                            num2 = Math.floor(Math.random() * 10) + 1;      // 1-10
-                            break;
-                        case 3:
-                            // Tablice 1-7
-                            num1 = Math.floor(Math.random() * 7) + 1;       // 1-7
-                            num2 = Math.floor(Math.random() * 12) + 1;      // 1-12
-                            break;
-                        case 4:
-                            // Tablice 1-9
-                            num1 = Math.floor(Math.random() * 9) + 1;       // 1-9
-                            num2 = Math.floor(Math.random() * 12) + 1;      // 1-12
-                            break;
-                        case 5:
-                            // Tablice 1-12
-                            num1 = Math.floor(Math.random() * 12) + 1;      // 1-12
-                            num2 = Math.floor(Math.random() * 12) + 1;      // 1-12
-                            break;
-                        case 6:
-                            // Proširene tablice 1-15
-                            num1 = Math.floor(Math.random() * 15) + 1;      // 1-15
-                            num2 = Math.floor(Math.random() * 15) + 1;      // 1-15
-                            break;
-                        case 7:
-                            // Teške tablice 1-20
-                            num1 = Math.floor(Math.random() * 20) + 1;      // 1-20
-                            num2 = Math.floor(Math.random() * 20) + 1;      // 1-20
-                            break;
-                        default:
-                            // Ekstremne tablice
-                            num1 = Math.floor(Math.random() * 25) + 1;      // 1-25
-                            num2 = Math.floor(Math.random() * 25) + 1;      // 1-25
-                    }
+                    // POBOLJŠANA Multiplication mode - prilagođeno djeci
+                    const ranges = this.getMultiplicationRanges(currentLevel, difficulty);
+                    num1 = Math.floor(Math.random() * ranges.max) + ranges.min;
+                    num2 = Math.floor(Math.random() * ranges.max) + ranges.min;
                 } else if (gameMode === GAME_MODES.SPRINT) {
-                    // Sprint mode - fokus na brzinu
-                    const maxFactor = Math.min(6 + currentLevel, 12);
-                    num1 = Math.floor(Math.random() * maxFactor) + 1;
-                    num2 = Math.floor(Math.random() * maxFactor) + 1;
+                    const ranges = this.getMultiplicationRanges(Math.min(currentLevel, 4), difficulty);
+                    num1 = Math.floor(Math.random() * ranges.max) + ranges.min;
+                    num2 = Math.floor(Math.random() * ranges.max) + ranges.min;
                 } else {
                     // Classic/Training mode
-                    const maxFactor = Math.min(8 + currentLevel, 15);
-                    num1 = Math.floor(Math.random() * maxFactor) + 1;
-                    num2 = Math.floor(Math.random() * maxFactor) + 1;
+                    const ranges = this.getMultiplicationRanges(currentLevel, difficulty);
+                    num1 = Math.floor(Math.random() * ranges.max) + ranges.min;
+                    num2 = Math.floor(Math.random() * ranges.max) + ranges.min;
                 }
                 result = num1 * num2;
                 question = `${num1} × ${num2}`;
@@ -228,60 +122,19 @@ export class GameLogic {
                 
             case '÷':
                 if (gameMode === GAME_MODES.DIVISION) {
-                    // POBOLJŠANA Division mode progresija
-                    switch (currentLevel) {
-                        case 1:
-                            // Lakše dijeljenje (rezultat 1-5)
-                            num2 = Math.floor(Math.random() * 5) + 2;       // djelitelj 2-6
-                            result = Math.floor(Math.random() * 5) + 1;     // rezultat 1-5
-                            break;
-                        case 2:
-                            // Umjereno dijeljenje (rezultat 1-8)
-                            num2 = Math.floor(Math.random() * 7) + 2;       // djelitelj 2-8
-                            result = Math.floor(Math.random() * 8) + 1;     // rezultat 1-8
-                            break;
-                        case 3:
-                            // Standardne tablice (rezultat 1-10)
-                            num2 = Math.floor(Math.random() * 9) + 2;       // djelitelj 2-10
-                            result = Math.floor(Math.random() * 10) + 1;    // rezultat 1-10
-                            break;
-                        case 4:
-                            // Proširene tablice (rezultat 1-12)
-                            num2 = Math.floor(Math.random() * 11) + 2;      // djelitelj 2-12
-                            result = Math.floor(Math.random() * 12) + 1;    // rezultat 1-12
-                            break;
-                        case 5:
-                            // Teže tablice (rezultat 1-15)
-                            num2 = Math.floor(Math.random() * 13) + 2;      // djelitelj 2-14
-                            result = Math.floor(Math.random() * 15) + 1;    // rezultat 1-15
-                            break;
-                        case 6:
-                            // Vrlo teške tablice (rezultat 1-20)
-                            num2 = Math.floor(Math.random() * 18) + 2;      // djelitelj 2-19
-                            result = Math.floor(Math.random() * 20) + 1;    // rezultat 1-20
-                            break;
-                        case 7:
-                            // Ekstremne tablice (rezultat 1-25)
-                            num2 = Math.floor(Math.random() * 23) + 2;      // djelitelj 2-24
-                            result = Math.floor(Math.random() * 25) + 1;    // rezultat 1-25
-                            break;
-                        default:
-                            // Najteže tablice
-                            num2 = Math.floor(Math.random() * 28) + 2;      // djelitelj 2-29
-                            result = Math.floor(Math.random() * 30) + 1;    // rezultat 1-30
-                    }
+                    // POBOLJŠANA Division mode - prilagođeno djeci
+                    const ranges = this.getDivisionRanges(currentLevel, difficulty);
+                    num2 = Math.floor(Math.random() * ranges.maxDivisor) + ranges.minDivisor;
+                    result = Math.floor(Math.random() * ranges.maxResult) + 1;
                 } else if (gameMode === GAME_MODES.SPRINT) {
-                    // Sprint mode - fokus na brzinu
-                    const maxDivisor = Math.min(5 + currentLevel, 12);
-                    const maxResult = Math.min(6 + currentLevel, 10);
-                    num2 = Math.floor(Math.random() * maxDivisor) + 2;
-                    result = Math.floor(Math.random() * maxResult) + 1;
+                    const ranges = this.getDivisionRanges(Math.min(currentLevel, 4), difficulty);
+                    num2 = Math.floor(Math.random() * ranges.maxDivisor) + ranges.minDivisor;
+                    result = Math.floor(Math.random() * ranges.maxResult) + 1;
                 } else {
                     // Classic/Training mode
-                    const maxDivisor = Math.min(8 + currentLevel, 15);
-                    const maxResult = Math.min(8 + currentLevel, 15);
-                    num2 = Math.floor(Math.random() * maxDivisor) + 2;
-                    result = Math.floor(Math.random() * maxResult) + 1;
+                    const ranges = this.getDivisionRanges(currentLevel, difficulty);
+                    num2 = Math.floor(Math.random() * ranges.maxDivisor) + ranges.minDivisor;
+                    result = Math.floor(Math.random() * ranges.maxResult) + 1;
                 }
                 num1 = num2 * result;
                 question = `${num1} ÷ ${num2}`;
@@ -291,7 +144,172 @@ export class GameLogic {
         return { question, correctAnswer: result };
     }
 
-    static calculateScore(timeLeft, streak, currentLevel, gameMode = GAME_MODES.CLASSIC) {
+    // NOVE HELPER FUNKCIJE ZA RANGES - PRILAGOĐENO DJECI DO 3. RAZREDA
+    static getAdditionRanges(level, difficulty) {
+        const ranges = {
+            1: {
+                easy: { min: 1, max: 5 },      // 1+1 do 5+5 = 10
+                medium: { min: 1, max: 10 },   // 1+1 do 10+10 = 20  
+                hard: { min: 1, max: 15 }      // 1+1 do 15+15 = 30
+            },
+            2: {
+                easy: { min: 1, max: 10 },     // do 20
+                medium: { min: 1, max: 15 },   // do 30
+                hard: { min: 1, max: 20 }      // do 40
+            },
+            3: {
+                easy: { min: 1, max: 15 },     // do 30
+                medium: { min: 1, max: 25 },   // do 50
+                hard: { min: 1, max: 35 }      // do 70
+            },
+            4: {
+                easy: { min: 1, max: 20 },     // do 40
+                medium: { min: 1, max: 30 },   // do 60
+                hard: { min: 1, max: 40 }      // do 80
+            },
+            5: {
+                easy: { min: 1, max: 25 },     // do 50
+                medium: { min: 1, max: 35 },   // do 70
+                hard: { min: 1, max: 45 }      // do 90
+            },
+            6: {
+                easy: { min: 1, max: 30 },     // do 60
+                medium: { min: 1, max: 40 },   // do 80
+                hard: { min: 1, max: 50 }      // do 100
+            },
+            7: {
+                easy: { min: 1, max: 35 },     // do 70
+                medium: { min: 1, max: 45 },   // do 90
+                hard: { min: 1, max: 55 }      // do 110
+            }
+        };
+        return ranges[level] ? ranges[level][difficulty] : ranges[7][difficulty];
+    }
+
+    static getSubtractionRanges(level, difficulty) {
+        const ranges = {
+            1: {
+                easy: { minFirst: 5, maxFirst: 10, maxSecond: 5 },    // 5-1 do 10-5
+                medium: { minFirst: 10, maxFirst: 20, maxSecond: 10 }, // 10-1 do 20-10
+                hard: { minFirst: 15, maxFirst: 30, maxSecond: 15 }    // 15-1 do 30-15
+            },
+            2: {
+                easy: { minFirst: 10, maxFirst: 20, maxSecond: 10 },
+                medium: { minFirst: 15, maxFirst: 30, maxSecond: 15 },
+                hard: { minFirst: 20, maxFirst: 40, maxSecond: 20 }
+            },
+            3: {
+                easy: { minFirst: 15, maxFirst: 30, maxSecond: 15 },
+                medium: { minFirst: 20, maxFirst: 50, maxSecond: 25 },
+                hard: { minFirst: 30, maxFirst: 70, maxSecond: 35 }
+            },
+            4: {
+                easy: { minFirst: 20, maxFirst: 40, maxSecond: 20 },
+                medium: { minFirst: 30, maxFirst: 60, maxSecond: 30 },
+                hard: { minFirst: 40, maxFirst: 80, maxSecond: 40 }
+            },
+            5: {
+                easy: { minFirst: 25, maxFirst: 50, maxSecond: 25 },
+                medium: { minFirst: 35, maxFirst: 70, maxSecond: 35 },
+                hard: { minFirst: 45, maxFirst: 90, maxSecond: 45 }
+            },
+            6: {
+                easy: { minFirst: 30, maxFirst: 60, maxSecond: 30 },
+                medium: { minFirst: 40, maxFirst: 80, maxSecond: 40 },
+                hard: { minFirst: 50, maxFirst: 100, maxSecond: 50 }
+            },
+            7: {
+                easy: { minFirst: 35, maxFirst: 70, maxSecond: 35 },
+                medium: { minFirst: 45, maxFirst: 90, maxSecond: 45 },
+                hard: { minFirst: 55, maxFirst: 110, maxSecond: 55 }
+            }
+        };
+        return ranges[level] ? ranges[level][difficulty] : ranges[7][difficulty];
+    }
+
+    static getMultiplicationRanges(level, difficulty) {
+        const ranges = {
+            1: {
+                easy: { min: 1, max: 2 },      // 1x1, 1x2, 2x1, 2x2
+                medium: { min: 1, max: 3 },    // tablice do 3
+                hard: { min: 1, max: 4 }       // tablice do 4
+            },
+            2: {
+                easy: { min: 1, max: 3 },      // tablice do 3
+                medium: { min: 1, max: 4 },    // tablice do 4
+                hard: { min: 1, max: 5 }       // tablice do 5
+            },
+            3: {
+                easy: { min: 1, max: 4 },      // tablice do 4
+                medium: { min: 1, max: 5 },    // tablice do 5
+                hard: { min: 1, max: 6 }       // tablice do 6
+            },
+            4: {
+                easy: { min: 1, max: 5 },      // tablice do 5
+                medium: { min: 1, max: 6 },    // tablice do 6
+                hard: { min: 1, max: 7 }       // tablice do 7
+            },
+            5: {
+                easy: { min: 1, max: 6 },      // tablice do 6
+                medium: { min: 1, max: 7 },    // tablice do 7
+                hard: { min: 1, max: 8 }       // tablice do 8
+            },
+            6: {
+                easy: { min: 1, max: 7 },      // tablice do 7
+                medium: { min: 1, max: 8 },    // tablice do 8
+                hard: { min: 1, max: 10 }      // tablice do 10
+            },
+            7: {
+                easy: { min: 1, max: 8 },      // tablice do 8
+                medium: { min: 1, max: 10 },   // tablice do 10
+                hard: { min: 1, max: 12 }      // tablice do 12 (tek na kraju!)
+            }
+        };
+        return ranges[level] ? ranges[level][difficulty] : ranges[7][difficulty];
+    }
+
+    static getDivisionRanges(level, difficulty) {
+        const ranges = {
+            1: {
+                easy: { minDivisor: 2, maxDivisor: 2, maxResult: 3 },    // 2÷2, 4÷2, 6÷2
+                medium: { minDivisor: 2, maxDivisor: 3, maxResult: 4 },   // do 3÷3, 12÷3
+                hard: { minDivisor: 2, maxDivisor: 4, maxResult: 5 }      // do 4÷4, 20÷4
+            },
+            2: {
+                easy: { minDivisor: 2, maxDivisor: 3, maxResult: 4 },
+                medium: { minDivisor: 2, maxDivisor: 4, maxResult: 5 },
+                hard: { minDivisor: 2, maxDivisor: 5, maxResult: 6 }
+            },
+            3: {
+                easy: { minDivisor: 2, maxDivisor: 4, maxResult: 5 },
+                medium: { minDivisor: 2, maxDivisor: 5, maxResult: 6 },
+                hard: { minDivisor: 2, maxDivisor: 6, maxResult: 7 }
+            },
+            4: {
+                easy: { minDivisor: 2, maxDivisor: 5, maxResult: 6 },
+                medium: { minDivisor: 2, maxDivisor: 6, maxResult: 7 },
+                hard: { minDivisor: 2, maxDivisor: 7, maxResult: 8 }
+            },
+            5: {
+                easy: { minDivisor: 2, maxDivisor: 6, maxResult: 7 },
+                medium: { minDivisor: 2, maxDivisor: 7, maxResult: 8 },
+                hard: { minDivisor: 2, maxDivisor: 8, maxResult: 9 }
+            },
+            6: {
+                easy: { minDivisor: 2, maxDivisor: 7, maxResult: 8 },
+                medium: { minDivisor: 2, maxDivisor: 8, maxResult: 9 },
+                hard: { minDivisor: 2, maxDivisor: 10, maxResult: 10 }
+            },
+            7: {
+                easy: { minDivisor: 2, maxDivisor: 8, maxResult: 9 },
+                medium: { minDivisor: 2, maxDivisor: 10, maxResult: 10 },
+                hard: { minDivisor: 2, maxDivisor: 12, maxResult: 12 }  // tek na kraju!
+            }
+        };
+        return ranges[level] ? ranges[level][difficulty] : ranges[7][difficulty];
+    }
+
+    static calculateScore(timeLeft, streak, currentLevel, gameMode = GAME_MODES.CLASSIC, difficulty = 'medium') {
         const timeBonus = timeLeft * 2;
         const streakBonus = streak * 5;
         const levelBonus = currentLevel * 10;
@@ -317,7 +335,21 @@ export class GameLogic {
                 modeMultiplier = 1;
         }
         
-        return Math.round((20 + timeBonus + streakBonus + levelBonus) * modeMultiplier);
+        // Difficulty multiplikatori
+        let difficultyMultiplier = 1;
+        switch (difficulty) {
+            case 'easy':
+                difficultyMultiplier = 0.8;
+                break;
+            case 'medium':
+                difficultyMultiplier = 1.0;
+                break;
+            case 'hard':
+                difficultyMultiplier = 1.3;
+                break;
+        }
+        
+        return Math.round((20 + timeBonus + streakBonus + levelBonus) * modeMultiplier * difficultyMultiplier);
     }
 
     static getLevelProgress(questionsInLevel, currentLevel, gameMode = GAME_MODES.CLASSIC) {
