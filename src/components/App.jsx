@@ -192,18 +192,24 @@ function App() {
         const activeGameMode = forceGameMode || gameMode;
         const activeLevel = forceLevel || currentLevel;
         
+        // Dobij difficulty iz player preferences
+        const allPlayers = getAllPlayers();
+        const playerData = allPlayers[playerName];
+        const difficulty = playerData?.statistics?.preferences?.difficulty || 'medium';
+        
         console.log('🎮 PRIJE generiranja:', { 
             currentLevel: activeLevel, 
             gameMode: activeGameMode, 
+            difficulty,
             questionsInLevel,
             forceGameMode,
             forceLevel 
         }); // Debug
         
-        const { question, correctAnswer: answer } = GameLogic.generateQuestion(activeLevel, activeGameMode);
+        const { question, correctAnswer: answer } = GameLogic.generateQuestion(activeLevel, activeGameMode, difficulty);
         const levelData = GameLogic.getCurrentLevelData(activeLevel);
         
-        console.log('🎯 Generiram pitanje:', question, '= ?', answer, 'Mode:', activeGameMode, 'Level:', activeLevel); // Debug log
+        console.log('🎯 Generiram pitanje:', question, '= ?', answer, 'Mode:', activeGameMode, 'Level:', activeLevel, 'Difficulty:', difficulty); // Debug log
         
         setCurrentQuestion(question);
         setCorrectAnswer(answer);
@@ -271,7 +277,12 @@ function App() {
     };
 
     const handleCorrectAnswer = () => {
-        const points = GameLogic.calculateScore(timeLeft, streak, currentLevel, gameMode);
+        // Dobij difficulty iz player preferences
+        const allPlayers = getAllPlayers();
+        const playerData = allPlayers[playerName];
+        const difficulty = playerData?.statistics?.preferences?.difficulty || 'medium';
+        
+        const points = GameLogic.calculateScore(timeLeft, streak, currentLevel, gameMode, difficulty);
         
         setScore(score + points);
         setStreak(streak + 1);
@@ -281,8 +292,6 @@ function App() {
         setShowFeedback(FEEDBACK_TYPES.CORRECT);
         
         // Zvuk za točan odgovor
-        const allPlayers = getAllPlayers();
-        const playerData = allPlayers[playerName];
         const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
         ThemeManager.playSound('correct', soundEnabled);
         
