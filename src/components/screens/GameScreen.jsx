@@ -1,6 +1,6 @@
-import { Heart, Clock } from '../Icons';
-import { GameLogic } from '../../services/gameLogic';
-import { FEEDBACK_TYPES, GAME_STATES } from '../../services/gameConfig';
+import React, { useState, useEffect } from 'react';
+import { GAME_STATES, FEEDBACK_TYPES, GAME_MODES } from '../../services/gameConfig.js';
+import { GameLogic } from '../../services/gameLogic.js';
 
 function GameScreen({ 
     currentQuestion, 
@@ -10,157 +10,338 @@ function GameScreen({
     showFeedback, 
     timeLeft, 
     lives, 
+    currentLevel, 
+    questionsInLevel, 
     score, 
-    currentLevel,
-    questionsInLevel,
-    streak,
-    getLevelProgress,
+    streak, 
+    gameMode,
+    getLevelProgress, 
     checkAnswer,
-    setGameState,
-    gameMode
+    setGameState 
 }) {
-    const levelData = GameLogic.getCurrentLevelData(currentLevel);
+    const [inputFocused, setInputFocused] = useState(false);
 
-    const handleQuitGame = () => {
-        if (window.confirm('Jeste li sigurni da želite prekinuti igru? Sav napredak će biti izgubljen.')) {
-            setGameState(GAME_STATES.MENU);
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key === 'Enter' && answer.trim() && !showFeedback) {
+                checkAnswer();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyPress);
+        return () => document.removeEventListener('keydown', handleKeyPress);
+    }, [answer, showFeedback, checkAnswer]);
+
+    // Inline stilovi za suženi layout
+    const containerStyle = {
+        maxWidth: '600px',  // Ograničena širina za fokus
+        margin: '0 auto',
+        padding: '1.5rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    };
+
+    const headerStyle = {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '2rem',
+        padding: '1rem',
+        backgroundColor: '#f8fafc',
+        borderRadius: '1rem',
+        border: '1px solid #e5e7eb'
+    };
+
+    const gameInfoStyle = {
+        display: 'flex',
+        gap: '1.5rem',
+        fontSize: '0.875rem',
+        color: '#6b7280'
+    };
+
+    const infoItemStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.25rem'
+    };
+
+    const infoLabelStyle = {
+        fontSize: '0.75rem',
+        fontWeight: '500',
+        textTransform: 'uppercase',
+        letterSpacing: '0.025em'
+    };
+
+    const infoValueStyle = {
+        fontSize: '1.125rem',
+        fontWeight: 'bold',
+        color: '#1f2937'
+    };
+
+    const backButtonStyle = {
+        backgroundColor: '#ef4444',
+        color: 'white',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        fontSize: '0.875rem',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+    };
+
+    // Glavni dio s pitanjem
+    const questionContainerStyle = {
+        backgroundColor: 'white',
+        borderRadius: '1.5rem',
+        padding: '3rem 2rem',
+        textAlign: 'center',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e5e7eb',
+        marginBottom: '2rem',
+        minHeight: '300px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: '2rem'
+    };
+
+    const levelIndicatorStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        fontSize: '1rem',
+        color: '#6b7280',
+        marginBottom: '1rem'
+    };
+
+    const questionStyle = {
+        fontSize: '3rem',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        margin: '0',
+        lineHeight: '1.2'
+    };
+
+    const inputContainerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem'
+    };
+
+    const answerInputStyle = {
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        padding: '1rem 1.5rem',
+        border: `3px solid ${inputFocused ? '#3b82f6' : '#d1d5db'}`,
+        borderRadius: '1rem',
+        textAlign: 'center',
+        width: '200px',
+        outline: 'none',
+        transition: 'all 0.2s ease',
+        backgroundColor: showFeedback ? (showFeedback === FEEDBACK_TYPES.CORRECT ? '#d1fae5' : '#fee2e2') : 'white'
+    };
+
+    const submitButtonStyle = {
+        background: 'linear-gradient(135deg, #10b981, #047857)',
+        color: 'white',
+        border: 'none',
+        padding: '1rem 2rem',
+        fontSize: '1.125rem',
+        fontWeight: '600',
+        borderRadius: '0.75rem',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        opacity: (!answer.trim() || showFeedback) ? 0.5 : 1,
+        transform: (!answer.trim() || showFeedback) ? 'none' : 'scale(1)',
+        boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+    };
+
+    const feedbackStyle = {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        padding: '1rem',
+        borderRadius: '0.75rem',
+        color: 'white',
+        background: showFeedback === FEEDBACK_TYPES.CORRECT 
+            ? 'linear-gradient(135deg, #10b981, #047857)' 
+            : showFeedback === FEEDBACK_TYPES.WRONG
+            ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+            : 'linear-gradient(135deg, #f59e0b, #d97706)'
+    };
+
+    // Progress sekcija
+    const progressStyle = {
+        backgroundColor: 'white',
+        borderRadius: '1rem',
+        padding: '1.5rem',
+        border: '1px solid #e5e7eb'
+    };
+
+    const progressHeaderStyle = {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1rem'
+    };
+
+    const progressTitleStyle = {
+        fontSize: '1rem',
+        fontWeight: '600',
+        color: '#1f2937'
+    };
+
+    const progressBarContainerStyle = {
+        width: '100%',
+        height: '0.75rem',
+        backgroundColor: '#e5e7eb',
+        borderRadius: '0.5rem',
+        overflow: 'hidden'
+    };
+
+    const progressBarFillStyle = {
+        height: '100%',
+        background: 'linear-gradient(90deg, #3b82f6, #1d4ed8)',
+        borderRadius: 'inherit',
+        width: `${getLevelProgress()}%`,
+        transition: 'width 0.3s ease'
+    };
+
+    const levelData = GameLogic.getCurrentLevelData(currentLevel);
+    const gameModeName = GameLogic.getGameModeDisplayName(gameMode);
+
+    const getFeedbackText = () => {
+        switch (showFeedback) {
+            case FEEDBACK_TYPES.CORRECT:
+                return '🎉 Odlično!';
+            case FEEDBACK_TYPES.WRONG:
+                return `❌ Netočno! Odgovor je ${correctAnswer}`;
+            case FEEDBACK_TYPES.TIMEOUT:
+                return `⏰ Vrijeme je isteklo! Odgovor je ${correctAnswer}`;
+            default:
+                return '';
         }
     };
 
-    const renderFeedback = () => {
-        if (!showFeedback) return null;
-
-        const feedbackClasses = {
-            [FEEDBACK_TYPES.CORRECT]: 'feedback-correct',
-            [FEEDBACK_TYPES.WRONG]: 'feedback-wrong',
-            [FEEDBACK_TYPES.TIMEOUT]: 'feedback-timeout'
-        };
-
-        return (
-            <div className={`mb-4 ${feedbackClasses[showFeedback]}`}>
-                {showFeedback === FEEDBACK_TYPES.CORRECT && (
-                    <div className="flex items-center justify-center gap-3">
-                        <div className="animate-ping text-yellow-400 text-xl">⭐</div>
-                        <div className="flex flex-col items-center">
-                            <div className="text-3xl animate-bounce mb-1">🎉</div>
-                            <div className="font-bold">Odlično!</div>
-                        </div>
-                        <div className="animate-ping text-yellow-400 text-xl">⭐</div>
-                    </div>
-                )}
-                {showFeedback === FEEDBACK_TYPES.WRONG && `❌ Odgovor je ${correctAnswer}`}
-                {showFeedback === FEEDBACK_TYPES.TIMEOUT && '⏰ Vrijeme je isteklo!'}
-            </div>
-        );
+    const getTimerColor = () => {
+        if (gameMode === GAME_MODES.TRAINING) return '#6b7280';
+        if (timeLeft <= 5) return '#ef4444';
+        if (timeLeft <= 10) return '#f59e0b';
+        return '#10b981';
     };
 
     return (
-        <div className="text-center">
-            {/* Header with Quit button */}
-            <div className="flex justify-between items-center mb-4">
-                <button
-                    onClick={handleQuitGame}
-                    className="text-sm bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors"
-                >
-                    ❌ Prekini
-                </button>
-                <div className="text-sm text-gray-600">
-                    {gameMode === 'training' ? 'Trening način' : `Nivo ${currentLevel}`}
-                </div>
-            </div>
-
-            {/* Lives and Score */}
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex gap-1">
-                    {gameMode !== 'training' && [...Array(3)].map((_, i) => (
-                        <Heart 
-                            key={i} 
-                            className={`w-5 h-5 ${i < lives ? 'text-red-500 fill-current' : 'text-gray-300'}`} 
-                        />
-                    ))}
-                    {gameMode === 'training' && (
-                        <span className="text-sm text-green-600 font-bold">∞ Beskonačni životi</span>
+        <div style={containerStyle}>
+            {/* Header sa informacijama */}
+            <div style={headerStyle}>
+                <div style={gameInfoStyle}>
+                    <div style={infoItemStyle}>
+                        <span style={infoLabelStyle}>Nivo</span>
+                        <span style={infoValueStyle}>{currentLevel}</span>
+                    </div>
+                    <div style={infoItemStyle}>
+                        <span style={infoLabelStyle}>Rezultat</span>
+                        <span style={infoValueStyle}>{score.toLocaleString()}</span>
+                    </div>
+                    <div style={infoItemStyle}>
+                        <span style={infoLabelStyle}>Niz</span>
+                        <span style={infoValueStyle}>{streak}</span>
+                    </div>
+                    {gameMode !== GAME_MODES.TRAINING && (
+                        <div style={infoItemStyle}>
+                            <span style={infoLabelStyle}>Vrijeme</span>
+                            <span style={{...infoValueStyle, color: getTimerColor()}}>{timeLeft}s</span>
+                        </div>
                     )}
-                </div>
-                <div className="text-lg font-bold text-purple-600">
-                    <span className={score > 0 ? 'animate-pulse' : ''}>{score}</span> 🌟
-                </div>
-            </div>
-
-            {/* Level Progress */}
-            <div className="mb-4">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-2xl">{levelData.emoji}</span>
-                    <span className="font-bold text-lg text-purple-700">
-                        Nivo {currentLevel}: {levelData.name}
-                    </span>
-                </div>
-                
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                    <div 
-                        className="level-progress"
-                        style={{ width: `${getLevelProgress()}%` }}
-                    ></div>
-                </div>
-                <div className="text-sm text-gray-600">
-                    {questionsInLevel}/{levelData.questionsNeeded} zadataka
-                </div>
-            </div>
-
-            {/* Timer and Streak */}
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-2">
-                    {gameMode !== 'training' ? (
-                        <>
-                            <Clock className="text-blue-500" size={18} />
-                            <span className={`text-lg font-bold ${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`}>
-                                {timeLeft}s
+                    {gameMode !== GAME_MODES.TRAINING && (
+                        <div style={infoItemStyle}>
+                            <span style={infoLabelStyle}>Životi</span>
+                            <span style={infoValueStyle}>
+                                {'❤️'.repeat(lives) + '🤍'.repeat(Math.max(0, 3 - lives))}
                             </span>
-                        </>
-                    ) : (
-                        <span className="text-sm text-blue-600">⌛ Bez vremenskog ograničenja</span>
+                        </div>
                     )}
                 </div>
-                {streak > 0 && (
-                    <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-bold">
-                        🔥 {streak}
-                    </span>
+                <button
+                    onClick={() => setGameState(GAME_STATES.MENU)}
+                    style={backButtonStyle}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                >
+                    ✕ Izađi
+                </button>
+            </div>
+
+            {/* Glavno pitanje */}
+            <div style={questionContainerStyle}>
+                <div style={levelIndicatorStyle}>
+                    <span>{levelData.emoji}</span>
+                    <span>{levelData.name} • {gameModeName}</span>
+                </div>
+
+                <div style={questionStyle}>
+                    {currentQuestion} = ?
+                </div>
+
+                {!showFeedback ? (
+                    <div style={inputContainerStyle}>
+                        <input
+                            type="number"
+                            value={answer}
+                            onChange={(e) => setAnswer(e.target.value)}
+                            onFocus={() => setInputFocused(true)}
+                            onBlur={() => setInputFocused(false)}
+                            style={answerInputStyle}
+                            placeholder="?"
+                            autoFocus
+                        />
+                        
+                        <button
+                            onClick={checkAnswer}
+                            disabled={!answer.trim() || showFeedback}
+                            style={submitButtonStyle}
+                            onMouseOver={(e) => {
+                                if (!e.target.disabled) {
+                                    e.target.style.transform = 'translateY(-2px) scale(1.05)';
+                                    e.target.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.6)';
+                                }
+                            }}
+                            onMouseOut={(e) => {
+                                if (!e.target.disabled) {
+                                    e.target.style.transform = 'translateY(0) scale(1)';
+                                    e.target.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.4)';
+                                }
+                            }}
+                        >
+                            ✓ Potvrdi
+                        </button>
+
+                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                            Pritisni Enter za brži odgovor
+                        </div>
+                    </div>
+                ) : (
+                    <div style={feedbackStyle}>
+                        {getFeedbackText()}
+                    </div>
                 )}
             </div>
 
-            {/* Question */}
-            <div className="mb-6">
-                <div className="text-3xl font-bold text-gray-800 mb-4 p-6 bg-gray-50 rounded-xl">
-                    {currentQuestion} = ?
+            {/* Progress bar */}
+            <div style={progressStyle}>
+                <div style={progressHeaderStyle}>
+                    <span style={progressTitleStyle}>
+                        Napredak nivoa {currentLevel}
+                    </span>
+                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                        {questionsInLevel} / {levelData.questionsNeeded}
+                    </span>
+                </div>
+                <div style={progressBarContainerStyle}>
+                    <div style={progressBarFillStyle}></div>
                 </div>
             </div>
-
-            {/* Feedback */}
-            {renderFeedback()}
-
-            {/* Answer Input */}
-            <div className="mb-6">
-                <input
-                    key={`level-${currentLevel}-q-${questionsInLevel}`}
-                    type="number"
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && answer && checkAnswer()}
-                    className="input-answer"
-                    placeholder="Vaš odgovor..."
-                    disabled={showFeedback !== ''}
-                    autoFocus
-                />
-            </div>
-
-            {/* Submit Button */}
-            <button 
-                onClick={checkAnswer}
-                disabled={!answer || showFeedback !== ''}
-                className="button-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                ✓ Potvrdi
-            </button>
         </div>
     );
 }
