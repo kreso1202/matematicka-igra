@@ -1,96 +1,319 @@
-import { GAME_MODES, GAME_STATES } from '../../services/gameConfig';
+import React from 'react';
+import { GAME_STATES, GAME_MODES } from '../../services/gameConfig.js';
+import { GameLogic } from '../../services/gameLogic.js';
+import { ThemeManager } from '../../services/themeManager.js';
 
-function GameModesScreen({ setGameState, startGame, playerName }) {
-    const gameModes = [
+function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers }) {
+    const allPlayers = getAllPlayers();
+    const playerData = allPlayers[playerName];
+    const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+
+    const handleGameModeSelect = (mode) => {
+        if (soundEnabled) {
+            ThemeManager.playSound('click', true);
+        }
+        startGame(mode);
+    };
+
+    const gameModesConfig = [
         {
             mode: GAME_MODES.CLASSIC,
-            name: "Klasična igra",
-            description: "Standardna igra kroz nivoe",
-            emoji: "🎯",
-            color: "from-blue-400 to-blue-600"
+            gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            difficulty: 'Svi nivoi'
         },
         {
             mode: GAME_MODES.TRAINING,
-            name: "Trening",
-            description: "Bez vremena i života - samo učenje",
-            emoji: "📚",
-            color: "from-green-400 to-green-600"
+            gradient: 'linear-gradient(135deg, #10b981, #047857)',
+            difficulty: 'Bez vremena'
         },
         {
             mode: GAME_MODES.SPRINT,
-            name: "Sprint",
-            description: "Što više zadataka u 60 sekundi",
-            emoji: "⚡",
-            color: "from-yellow-400 to-orange-500"
-        },
-        {
-            mode: GAME_MODES.MULTIPLICATION,
-            name: "Samo množenje",
-            description: "Vježbaj tablice množenja",
-            emoji: "✖️",
-            color: "from-purple-400 to-purple-600"
-        },
-        {
-            mode: GAME_MODES.DIVISION,
-            name: "Samo dijeljenje",
-            description: "Usavršavaj dijeljenje",
-            emoji: "➗",
-            color: "from-red-400 to-red-600"
+            gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            difficulty: 'Brža igra'
         },
         {
             mode: GAME_MODES.ADDITION,
-            name: "Samo zbrajanje",
-            description: "Osnove zbrajanja",
-            emoji: "➕",
-            color: "from-teal-400 to-teal-600"
+            gradient: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+            difficulty: 'Samo zbrajanje'
         },
         {
             mode: GAME_MODES.SUBTRACTION,
-            name: "Samo oduzimanje", 
-            description: "Vježbaj oduzimanje",
-            emoji: "➖",
-            color: "from-indigo-400 to-indigo-600"
+            gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+            difficulty: 'Samo oduzimanje'
+        },
+        {
+            mode: GAME_MODES.MULTIPLICATION,
+            gradient: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            difficulty: 'Tablice množenja'
+        },
+        {
+            mode: GAME_MODES.DIVISION,
+            gradient: 'linear-gradient(135deg, #f97316, #ea580c)',
+            difficulty: 'Tablice dijeljenja'
         }
     ];
 
-    const handleModeSelect = (gameMode) => {
-        startGame(gameMode);
+    // Inline stilovi
+    const containerStyle = {
+        maxWidth: '1024px',
+        margin: '0 auto',
+        padding: '1.5rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
 
+    const headerStyle = {
+        textAlign: 'center',
+        marginBottom: '2rem'
+    };
+
+    const titleStyle = {
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        margin: '0 0 0.5rem 0'
+    };
+
+    const subtitleStyle = {
+        fontSize: '1.125rem',
+        color: '#6b7280',
+        margin: 0
+    };
+
+    const backButtonStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        backgroundColor: '#6b7280',
+        color: 'white',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        transition: 'background-color 0.2s ease',
+        marginBottom: '1rem'
+    };
+
+    const modesGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '2rem'
+    };
+
+    const modeCardStyle = (gradient) => ({
+        background: gradient,
+        color: 'white',
+        border: 'none',
+        borderRadius: '1rem',
+        padding: '2rem',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        textAlign: 'left',
+        fontFamily: 'inherit',
+        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+        position: 'relative',
+        overflow: 'hidden'
+    });
+
+    const modeHeaderStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1rem'
+    };
+
+    const modeIconStyle = {
+        fontSize: '2.5rem',
+        width: '4rem',
+        height: '4rem',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    };
+
+    const modeTitleStyle = {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        margin: '0 0 0.25rem 0'
+    };
+
+    const modeDifficultyStyle = {
+        fontSize: '0.875rem',
+        opacity: 0.9,
+        margin: 0
+    };
+
+    const modeDescriptionStyle = {
+        fontSize: '1rem',
+        lineHeight: '1.5',
+        opacity: 0.95,
+        marginBottom: '1.5rem'
+    };
+
+    const modeStatsStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '1rem',
+        marginTop: '1rem'
+    };
+
+    const statItemStyle = {
+        textAlign: 'center',
+        padding: '0.75rem',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: '0.5rem'
+    };
+
+    const statValueStyle = {
+        fontSize: '1.25rem',
+        fontWeight: 'bold',
+        margin: '0 0 0.25rem 0'
+    };
+
+    const statLabelStyle = {
+        fontSize: '0.75rem',
+        opacity: 0.8,
+        margin: 0
+    };
+
+    const playerStats = playerData?.statistics?.gameModeStats || {};
+
     return (
-        <div className="text-center">
-            <div className="mb-6">
-                <h2 className="text-3xl font-bold text-purple-600 mb-2">
-                    Načini igre 🎮
-                </h2>
-                <p className="text-gray-600">Odaberi kako želiš igrati, {playerName}!</p>
+        <div style={containerStyle}>
+            {/* Header */}
+            <div style={headerStyle}>
+                <button 
+                    onClick={() => setGameState(GAME_STATES.MENU)}
+                    style={backButtonStyle}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#4b5563'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
+                >
+                    ← Povratak
+                </button>
+                
+                <h2 style={titleStyle}>🎮 Odaberi način igre</h2>
+                <p style={subtitleStyle}>Svaki način ima jedinstvene izazove</p>
             </div>
 
-            <div className="space-y-3 mb-6">
-                {gameModes.map((mode) => (
-                    <button
-                        key={mode.mode}
-                        onClick={() => handleModeSelect(mode.mode)}
-                        className={`w-full bg-gradient-to-r ${mode.color} text-white font-bold py-4 px-6 rounded-xl hover:scale-105 transform transition-all duration-200 flex items-center justify-between`}
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="text-2xl">{mode.emoji}</span>
-                            <div className="text-left">
-                                <div className="text-lg font-bold">{mode.name}</div>
-                                <div className="text-sm opacity-90">{mode.description}</div>
+            {/* Game Modes Grid */}
+            <div style={modesGridStyle}>
+                {gameModesConfig.map((config) => {
+                    const modeStats = playerStats[config.mode] || { gamesPlayed: 0, bestScore: 0 };
+                    const [isHovered, setIsHovered] = React.useState(false);
+                    
+                    return (
+                        <button
+                            key={config.mode}
+                            onClick={() => handleGameModeSelect(config.mode)}
+                            style={{
+                                ...modeCardStyle(config.gradient),
+                                transform: isHovered ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
+                                boxShadow: isHovered 
+                                    ? '0 12px 30px rgba(0,0,0,0.2)' 
+                                    : '0 4px 15px rgba(0,0,0,0.1)'
+                            }}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                            {/* Header */}
+                            <div style={modeHeaderStyle}>
+                                <div style={modeIconStyle}>
+                                    {GameLogic.getGameModeIcon(config.mode)}
+                                </div>
+                                <div>
+                                    <h3 style={modeTitleStyle}>
+                                        {GameLogic.getGameModeDisplayName(config.mode)}
+                                    </h3>
+                                    <p style={modeDifficultyStyle}>
+                                        {config.difficulty}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <span className="text-xl">▶️</span>
-                    </button>
-                ))}
+
+                            {/* Description */}
+                            <p style={modeDescriptionStyle}>
+                                {GameLogic.getGameModeDescription(config.mode)}
+                            </p>
+
+                            {/* Player Stats */}
+                            {modeStats.gamesPlayed > 0 && (
+                                <div style={modeStatsStyle}>
+                                    <div style={statItemStyle}>
+                                        <div style={statValueStyle}>{modeStats.gamesPlayed}</div>
+                                        <div style={statLabelStyle}>Igara</div>
+                                    </div>
+                                    <div style={statItemStyle}>
+                                        <div style={statValueStyle}>{modeStats.bestScore}</div>
+                                        <div style={statLabelStyle}>Najbolji</div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* New Mode Indicator */}
+                            {modeStats.gamesPlayed === 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '1rem',
+                                    right: '1rem',
+                                    backgroundColor: '#22c55e',
+                                    color: 'white',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '0.375rem',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold'
+                                }}>
+                                    NOVO!
+                                </div>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
-            <button 
-                onClick={() => setGameState(GAME_STATES.MENU)}
-                className="button-secondary"
-            >
-                🏠 Povratak
-            </button>
+            {/* Info Section */}
+            <div style={{
+                backgroundColor: 'white',
+                padding: '1.5rem',
+                borderRadius: '0.75rem',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            }}>
+                <h3 style={{
+                    fontSize: '1.125rem',
+                    fontWeight: 'bold',
+                    marginBottom: '1rem',
+                    color: '#1f2937',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                }}>
+                    💡 Savjeti za različite načine
+                </h3>
+
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                    gap: '1rem',
+                    fontSize: '0.875rem',
+                    color: '#6b7280'
+                }}>
+                    <div>
+                        <strong style={{ color: '#3b82f6' }}>🎯 Klasična:</strong> Najbolji način za napredovanje kroz sve nivoe
+                    </div>
+                    <div>
+                        <strong style={{ color: '#10b981' }}>🏋️ Trening:</strong> Vježbaj bez pritiska vremena
+                    </div>
+                    <div>
+                        <strong style={{ color: '#f59e0b' }}>⚡ Sprint:</strong> Test brzine s povećanim brojem pitanja
+                    </div>
+                    <div>
+                        <strong style={{ color: '#ef4444' }}>✖️ Množenje:</strong> Savladaj tablice množenja do 12x12
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
