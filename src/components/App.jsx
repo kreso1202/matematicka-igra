@@ -208,6 +208,8 @@ function App() {
         const { question, correctAnswer: answer } = GameLogic.generateQuestion(currentLevel, gameMode);
         const levelData = GameLogic.getCurrentLevelData(currentLevel);
         
+        console.log('🎯 Generiram pitanje:', question, '= ?', answer); // Debug log
+        
         setCurrentQuestion(question);
         setCorrectAnswer(answer);
         setTimeLeft(levelData.timeLimit);
@@ -224,10 +226,16 @@ function App() {
         setMaxStreak(0);
         setAnswer('');
         setShowFeedback('');
+        setCurrentQuestion(''); // Resetiraj trenutno pitanje
+        setCorrectAnswer(0);    // Resetiraj točan odgovor
         setSessionStats({ correct: 0, wrong: 0, timeouts: 0 });
         setGameStartTime(Date.now());
-        generateQuestion();
-        GameLogic.focusInput(300);
+        
+        // Dodaj timeout da se state resetira prije generiranja pitanja
+        setTimeout(() => {
+            generateQuestion();
+            GameLogic.focusInput(300);
+        }, 100);
     };
 
     const nextLevel = () => {
@@ -252,6 +260,8 @@ function App() {
 
     const checkAnswer = () => {
         const userAnswer = parseInt(answer);
+        
+        console.log('✅ Provjeravam:', userAnswer, 'vs', correctAnswer); // Debug log
         
         if (userAnswer === correctAnswer) {
             handleCorrectAnswer();
