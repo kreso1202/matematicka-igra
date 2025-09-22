@@ -328,7 +328,11 @@ function App() {
         const allPlayers = getAllPlayers();
         const playerData = allPlayers[playerName];
         const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+        const showTips = playerData?.statistics?.preferences?.showTips !== false;
         ThemeManager.playSound('wrong', soundEnabled);
+        
+        // Longer delay if tips are enabled to give time to read
+        const feedbackDelay = showTips ? 5000 : 2000; // 5 seconds with tips, 2 seconds without
         
         if (gameMode === GAME_MODES.TRAINING) {
             // In training mode, just show feedback and continue
@@ -339,7 +343,7 @@ function App() {
                 setShowFeedback('');
                 generateQuestion();
                 GameLogic.focusInput(100);
-            }, 2000);
+            }, feedbackDelay);
         } else {
             setLives(lives - 1);
             setStreak(0);
@@ -355,7 +359,7 @@ function App() {
                     generateQuestion();
                     GameLogic.focusInput(100);
                 }
-            }, 2000);
+            }, feedbackDelay);
         }
     };
 
