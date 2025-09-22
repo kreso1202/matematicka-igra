@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
-import { GAME_STATES, FEEDBACK_TYPES, GAME_MODES, STORY_ADVENTURES, STORY_PROGRESS } from '../services/gameConfig.js';
+import { GAME_STATES, FEEDBACK_TYPES, GAME_MODES } from '../services/gameConfig.js';
 import { CloudStorage, LocalStorage } from '../services/cloudStorage.js';
 import { GameLogic, PlayerManager } from '../services/gameLogic.js';
 import { AchievementManager } from '../services/achievementManager.js';
 import { ThemeManager } from '../services/themeManager.js';
-import { StoryManager } from '../services/gameConfig.js';
 import WelcomeScreen from './screens/WelcomeScreen.jsx';
 import MenuScreen from './screens/MenuScreen.jsx';
 import GameModesScreen from './screens/GameModesScreen.jsx';
 import GameScreen from './screens/GameScreen.jsx';
-import StoryMenuScreen from './screens/StoryMenuScreen.jsx';
-import StoryGameScreen from './screens/StoryGameScreen.jsx';
 import LevelCompleteScreen from './screens/LevelCompleteScreen.jsx';
 import GameOverScreen from './screens/GameOverScreen.jsx';
 import LeaderboardScreen from './screens/LeaderboardScreen.jsx';
@@ -142,11 +139,6 @@ function App() {
     const [fastestAnswerTime, setFastestAnswerTime] = useState(null);
     const [questionStartTime, setQuestionStartTime] = useState(null);
     
-    // NEW: Story mode states
-    const [currentStoryId, setCurrentStoryId] = useState(null);
-    const [storyProgress, setStoryProgress] = useState({ levelIndex: 0, questionIndex: 0 });
-    const [currentStoryQuestion, setCurrentStoryQuestion] = useState(null);
-    
     // UI state
     const [isOnline, setIsOnline] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
@@ -195,100 +187,6 @@ function App() {
         } catch (error) {
             setIsOnline(false);
             return false;
-        }
-    };
-
-    // NEW: Story mode functions
-    const startStoryMode = (storyId) => {
-        console.log('🚀 POČINJE STORY MODE:', storyId);
-        setCurrentStoryId(storyId);
-        setStoryProgress({ levelIndex: 0, questionIndex: 0 });
-        
-        // Set up first story question
-        const story = STORY_ADVENTURES[storyId];
-        const firstQuestion = story.levels[0].questions[0];
-        setCurrentStoryQuestion(StoryManager.generateStoryQuestion(firstQuestion));
-        
-        setGameState('storyPlaying');
-        
-        // Initialize story session
-        setScore(0);
-        setStreak(0);
-        setSessionStats({ correct: 0, wrong: 0, timeouts: 0 });
-        setGameStartTime(Date.now());
-    };
-
-    const onStoryAnswered = (isCorrect) => {
-        if (isCorrect) {
-            setScore(score + 50); // Story mode points
-            setStreak(streak + 1);
-            setSessionStats(prev => ({ ...prev, correct: prev.correct + 1 }));
-            
-            const story = STORY_ADVENTURES[currentStoryId];
-            const currentLevelData = story.levels[storyProgress.levelIndex];
-            const nextQuestionIndex = storyProgress.questionIndex + 1;
-            
-            if (nextQuestionIndex < currentLevelData.questions.length) {
-                // Next question in current level
-                const nextQuestion = currentLevelData.questions[nextQuestionIndex];
-                setCurrentStoryQuestion(StoryManager.generateStoryQuestion(nextQuestion));
-                setStoryProgress({ ...storyProgress, questionIndex: nextQuestionIndex });
-            } else {
-                // Level completed
-                completeStoryLevel();
-            }
-        } else {
-            setSessionStats(prev => ({ ...prev, wrong: prev.wrong + 1 }));
-            setStreak(0);
-        }
-    };
-
-    const completeStoryLevel = () => {
-        const story = STORY_ADVENTURES[currentStoryId];
-        const isStoryComplete = storyProgress.levelIndex >= story.levels.length - 1;
-        
-        if (isStoryComplete) {
-            // Complete story
-            updateStoryProgressInPlayerData(STORY_PROGRESS.COMPLETED);
-            setGameState('storyComplete');
-        } else {
-            // Move to next level (for multi-level stories)
-            const nextLevelIndex = storyProgress.levelIndex + 1;
-            setStoryProgress({ levelIndex: nextLevelIndex, questionIndex: 0 });
-            
-            const nextQuestion = story.levels[nextLevelIndex].questions[0];
-            setCurrentStoryQuestion(StoryManager.generateStoryQuestion(nextQuestion));
-        }
-    };
-
-    const updateStoryProgressInPlayerData = (status) => {
-        const allPlayers = getAllPlayers();
-        const updatedPlayerData = {
-            ...allPlayers,
-            [playerName]: {
-                ...allPlayers[playerName],
-                statistics: {
-                    ...allPlayers[playerName].statistics,
-                    storyMode: {
-                        ...allPlayers[playerName].statistics.storyMode,
-                        [currentStoryId]: {
-                            status: status,
-                            completedAt: status === STORY_PROGRESS.COMPLETED ? new Date().toISOString() : null,
-                            bestScore: Math.max(
-                                allPlayers[playerName].statistics.storyMode?.[currentStoryId]?.bestScore || 0,
-                                score
-                            )
-                        }
-                    }
-                }
-            }
-        };
-
-        setLocalData(updatedPlayerData);
-        LocalStorage.save(updatedPlayerData);
-
-        if (isJsonBinConfigured()) {
-            saveToCloud(updatedPlayerData);
         }
     };
 
@@ -556,8 +454,7 @@ function App() {
                 dailyStats: {},
                 achievements: { unlocked: [], progress: {} },
                 preferences: {},
-                fastestAnswer: null,
-                storyMode: {} // NEW: Story mode progress
+                fastestAnswer: null
             }
         };
         
@@ -660,8 +557,7 @@ function App() {
         gameMode,
         updatePlayerPreferences,
         newAchievements,
-        setNewAchievements,
-        startStoryMode // NEW: Story mode function
+        setNewAchievements
     };
 
     const gameProps = {
@@ -678,15 +574,6 @@ function App() {
         checkAnswer
     };
 
-    // NEW: Story mode props
-    const storyProps = {
-        ...commonProps,
-        currentStory: currentStoryId,
-        storyProgress,
-        currentStoryQuestion,
-        onStoryAnswered
-    };
-
     return (
         <div className="game-container min-h-screen transition-colors duration-300" style={{
             background: 'var(--bg-primary, #ffffff)',
@@ -694,14 +581,14 @@ function App() {
         }}>
             <div className="game-card" style={{
                 maxWidth: gameState === GAME_STATES.WELCOME ? '500px' : 
-                          gameState === GAME_STATES.PLAYING || gameState === 'storyPlaying' ? '700px' : '1200px',
+                          gameState === GAME_STATES.PLAYING ? '700px' : '1200px',
                 margin: '0 auto',
                 background: 'var(--bg-card, #ffffff)',
                 borderRadius: '1rem',
                 border: '1px solid var(--border-color, #d1d5db)',
                 boxShadow: '0 10px 25px var(--shadow, rgba(0,0,0,0.1))',
                 padding: gameState === GAME_STATES.WELCOME ? '2rem' : 
-                        gameState === GAME_STATES.PLAYING || gameState === 'storyPlaying' ? '1rem' : '2rem',
+                        gameState === GAME_STATES.PLAYING ? '1rem' : '2rem',
                 transition: 'all 0.3s ease'
             }}>
                 {isJsonBinConfigured() && (
@@ -734,49 +621,6 @@ function App() {
                 {gameState === GAME_STATES.STATISTICS && <StatisticsScreen {...commonProps} />}
                 {gameState === GAME_STATES.ACHIEVEMENTS && <AchievementsScreen {...commonProps} />}
                 {gameState === GAME_STATES.SETTINGS && <SettingsScreen {...commonProps} />}
-                
-                {/* NEW: Story mode screens */}
-                {gameState === 'storyMenu' && <StoryMenuScreen {...commonProps} />}
-                {gameState === 'storyPlaying' && <StoryGameScreen {...storyProps} />}
-                {gameState === 'storyComplete' && (
-                    <div style={{ textAlign: 'center', padding: '3rem' }}>
-                        <h2 style={{ fontSize: '2rem', color: '#10b981', marginBottom: '1rem' }}>
-                            📚 Priča završena!
-                        </h2>
-                        <p style={{ fontSize: '1.25rem', marginBottom: '2rem' }}>
-                            Čestitamo! Uspješno ste završili priču "{STORY_ADVENTURES[currentStoryId]?.title}".
-                        </p>
-                        <button 
-                            onClick={() => setGameState('storyMenu')}
-                            style={{
-                                background: 'linear-gradient(135deg, #10b981, #047857)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '1rem 2rem',
-                                fontSize: '1.125rem',
-                                borderRadius: '0.75rem',
-                                cursor: 'pointer',
-                                marginRight: '1rem'
-                            }}
-                        >
-                            📚 Više priča
-                        </button>
-                        <button 
-                            onClick={() => setGameState(GAME_STATES.MENU)}
-                            style={{
-                                backgroundColor: '#f3f4f6',
-                                color: '#374151',
-                                border: '1px solid #d1d5db',
-                                padding: '1rem 2rem',
-                                fontSize: '1.125rem',
-                                borderRadius: '0.75rem',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            🏠 Glavni meni
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );
