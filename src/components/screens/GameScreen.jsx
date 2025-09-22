@@ -36,24 +36,28 @@ function GameScreen({
     const containerStyle = {
         maxWidth: '600px',  // Ograničena širina za fokus
         margin: '0 auto',
-        padding: '1.5rem',
+        padding: '1rem', // Smanjeni padding za mobile
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
 
+    // FIXED: Mobile-responsive header
     const headerStyle = {
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '2rem',
+        flexDirection: 'column', // Stack vertically on mobile
+        gap: '1rem',
+        marginBottom: '1.5rem',
         padding: '1rem',
         backgroundColor: '#f8fafc',
         borderRadius: '1rem',
         border: '1px solid #e5e7eb'
     };
 
+    // FIXED: Mobile-responsive game info
     const gameInfoStyle = {
         display: 'flex',
-        gap: '1.5rem',
+        flexWrap: 'wrap', // Allow wrapping on small screens
+        justifyContent: 'center',
+        gap: '0.75rem', // Smaller gap for mobile
         fontSize: '0.875rem',
         color: '#6b7280'
     };
@@ -62,7 +66,8 @@ function GameScreen({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '0.25rem'
+        gap: '0.25rem',
+        minWidth: 'auto' // Allow flexible sizing
     };
 
     const infoLabelStyle = {
@@ -73,9 +78,16 @@ function GameScreen({
     };
 
     const infoValueStyle = {
-        fontSize: '1.125rem',
+        fontSize: '1rem', // Slightly smaller for mobile
         fontWeight: 'bold',
         color: '#1f2937'
+    };
+
+    // FIXED: Better positioned exit button
+    const exitButtonContainerStyle = {
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%'
     };
 
     const backButtonStyle = {
@@ -86,23 +98,24 @@ function GameScreen({
         borderRadius: '0.5rem',
         fontSize: '0.875rem',
         cursor: 'pointer',
-        transition: 'all 0.2s ease'
+        transition: 'all 0.2s ease',
+        maxWidth: '120px' // Ensure it fits on mobile
     };
 
     // Glavni dio s pitanjem
     const questionContainerStyle = {
         backgroundColor: 'white',
         borderRadius: '1.5rem',
-        padding: '3rem 2rem',
+        padding: '2rem 1rem', // Reduced horizontal padding for mobile
         textAlign: 'center',
         boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
         border: '1px solid #e5e7eb',
-        marginBottom: '2rem',
-        minHeight: '300px',
+        marginBottom: '1.5rem',
+        minHeight: '280px', // Reduced for mobile
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        gap: '2rem'
+        gap: '1.5rem' // Smaller gap for mobile
     };
 
     const levelIndicatorStyle = {
@@ -110,13 +123,13 @@ function GameScreen({
         alignItems: 'center',
         justifyContent: 'center',
         gap: '0.5rem',
-        fontSize: '1rem',
+        fontSize: '0.875rem', // Smaller for mobile
         color: '#6b7280',
         marginBottom: '1rem'
     };
 
     const questionStyle = {
-        fontSize: '3rem',
+        fontSize: '2.5rem', // Smaller for mobile
         fontWeight: 'bold',
         color: '#1f2937',
         margin: '0',
@@ -131,13 +144,14 @@ function GameScreen({
     };
 
     const answerInputStyle = {
-        fontSize: '2rem',
+        fontSize: '1.5rem', // Smaller for mobile
         fontWeight: 'bold',
-        padding: '1rem 1.5rem',
+        padding: '0.75rem 1rem', // Smaller padding
         border: `3px solid ${inputFocused ? '#3b82f6' : '#d1d5db'}`,
         borderRadius: '1rem',
         textAlign: 'center',
-        width: '200px',
+        width: '150px', // Smaller width for mobile
+        maxWidth: '90%', // Responsive max width
         outline: 'none',
         transition: 'all 0.2s ease',
         backgroundColor: showFeedback ? (showFeedback === FEEDBACK_TYPES.CORRECT ? '#d1fae5' : '#fee2e2') : 'white'
@@ -147,8 +161,8 @@ function GameScreen({
         background: 'linear-gradient(135deg, #10b981, #047857)',
         color: 'white',
         border: 'none',
-        padding: '1rem 2rem',
-        fontSize: '1.125rem',
+        padding: '0.75rem 1.5rem', // Smaller for mobile
+        fontSize: '1rem',
         fontWeight: '600',
         borderRadius: '0.75rem',
         cursor: 'pointer',
@@ -159,7 +173,7 @@ function GameScreen({
     };
 
     const feedbackStyle = {
-        fontSize: '1.5rem',
+        fontSize: '1.25rem', // Smaller for mobile
         fontWeight: 'bold',
         padding: '1rem',
         borderRadius: '0.75rem',
@@ -175,7 +189,7 @@ function GameScreen({
     const progressStyle = {
         backgroundColor: 'white',
         borderRadius: '1rem',
-        padding: '1.5rem',
+        padding: '1rem', // Smaller padding for mobile
         border: '1px solid #e5e7eb'
     };
 
@@ -183,11 +197,13 @@ function GameScreen({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '1rem'
+        marginBottom: '1rem',
+        flexWrap: 'wrap', // Allow wrapping on mobile
+        gap: '0.5rem'
     };
 
     const progressTitleStyle = {
-        fontSize: '1rem',
+        fontSize: '0.875rem', // Smaller for mobile
         fontWeight: '600',
         color: '#1f2937'
     };
@@ -206,6 +222,11 @@ function GameScreen({
         borderRadius: 'inherit',
         width: `${getLevelProgress()}%`,
         transition: 'width 0.3s ease'
+    };
+
+    const hintStyle = {
+        fontSize: '0.75rem', // Smaller for mobile
+        color: '#6b7280'
     };
 
     const levelData = GameLogic.getCurrentLevelData(currentLevel);
@@ -233,7 +254,7 @@ function GameScreen({
 
     return (
         <div style={containerStyle}>
-            {/* Header sa informacijama */}
+            {/* FIXED: Mobile-responsive header */}
             <div style={headerStyle}>
                 <div style={gameInfoStyle}>
                     <div style={infoItemStyle}>
@@ -263,14 +284,18 @@ function GameScreen({
                         </div>
                     )}
                 </div>
-                <button
-                    onClick={() => setGameState(GAME_STATES.MENU)}
-                    style={backButtonStyle}
-                    onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
-                    onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
-                >
-                    ✕ Izađi
-                </button>
+                
+                {/* FIXED: Centered exit button */}
+                <div style={exitButtonContainerStyle}>
+                    <button
+                        onClick={() => setGameState(GAME_STATES.MENU)}
+                        style={backButtonStyle}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                    >
+                        ✕ Izađi
+                    </button>
+                </div>
             </div>
 
             {/* Glavno pitanje */}
@@ -317,7 +342,7 @@ function GameScreen({
                             ✓ Potvrdi
                         </button>
 
-                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                        <div style={hintStyle}>
                             Pritisni Enter za brži odgovor
                         </div>
                     </div>
@@ -334,7 +359,7 @@ function GameScreen({
                     <span style={progressTitleStyle}>
                         Napredak nivoa {currentLevel}
                     </span>
-                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
                         {questionsInLevel} / {levelData.questionsNeeded}
                     </span>
                 </div>
@@ -342,6 +367,17 @@ function GameScreen({
                     <div style={progressBarFillStyle}></div>
                 </div>
             </div>
+
+            {/* Mobile-specific styles */}
+            <style>
+                {`
+                    @media (max-width: 480px) {
+                        .game-container {
+                            padding: 0.25rem !important;
+                        }
+                    }
+                `}
+            </style>
         </div>
     );
 }
