@@ -22,6 +22,7 @@ function GameScreen({
     getAllPlayers 
 }) {
     const [inputFocused, setInputFocused] = useState(false);
+    const [currentTip, setCurrentTip] = useState(null); // NEW: Store current tip
     
     // Get player preferences for tips
     const allPlayers = getAllPlayers();
@@ -38,6 +39,19 @@ function GameScreen({
         document.addEventListener('keydown', handleKeyPress);
         return () => document.removeEventListener('keydown', handleKeyPress);
     }, [answer, showFeedback, checkAnswer]);
+
+    // NEW: Set tip when wrong feedback is shown, clear when moving to next question
+    useEffect(() => {
+        if (showFeedback === FEEDBACK_TYPES.WRONG && showTips && !currentTip) {
+            // Generate tip only once when wrong feedback first appears
+            const operation = GameLogic.getOperationFromQuestion(currentQuestion);
+            const tip = GameLogic.getMathTip(operation, gameMode);
+            setCurrentTip(tip);
+        } else if (!showFeedback) {
+            // Clear tip when moving to next question
+            setCurrentTip(null);
+        }
+    }, [showFeedback, showTips, currentQuestion, gameMode, currentTip]);
 
     // Inline stilovi za suženi layout
     const containerStyle = {
@@ -280,17 +294,6 @@ function GameScreen({
         return '#10b981';
     };
 
-    // NEW: Get math tip for wrong answers
-    const getMathTip = () => {
-        if (!showTips || showFeedback !== FEEDBACK_TYPES.WRONG) return null;
-        
-        const operation = GameLogic.getOperationFromQuestion(currentQuestion);
-        const tip = GameLogic.getMathTip(operation, gameMode);
-        return tip;
-    };
-
-    const mathTip = getMathTip();
-
     return (
         <div style={containerStyle}>
             {/* Mobile-responsive header */}
@@ -391,10 +394,10 @@ function GameScreen({
                         </div>
                         
                         {/* NEW: Math tip display for wrong answers */}
-                        {mathTip && (
+                        {currentTip && (
                             <div style={mathTipStyle}>
                                 <span style={tipIconStyle}>💡</span>
-                                <strong>Savjet:</strong> {mathTip}
+                                <strong>Savjet:</strong> {currentTip}
                             </div>
                         )}
                     </div>
