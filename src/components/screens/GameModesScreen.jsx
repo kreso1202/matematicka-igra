@@ -2,8 +2,9 @@ import React from 'react';
 import { GAME_STATES, GAME_MODES } from '../../services/gameConfig.js';
 import { GameLogic } from '../../services/gameLogic.js';
 import { ThemeManager } from '../../services/themeManager.js';
+import { StoryManager } from '../../services/gameConfig.js';
 
-function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers }) {
+function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers, startStoryMode }) {
     const allPlayers = getAllPlayers();
     const playerData = allPlayers[playerName];
     const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
@@ -15,7 +16,13 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
         if (soundEnabled) {
             ThemeManager.playSound('click', true);
         }
-        startGame(mode);
+        
+        // Handle story mode differently
+        if (mode === GAME_MODES.STORY) {
+            setGameState('storyMenu');
+        } else {
+            startGame(mode);
+        }
     };
 
     const gameModesConfig = [
@@ -33,6 +40,11 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
             mode: GAME_MODES.SPRINT,
             gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
             difficulty: 'Brža igra'
+        },
+        {
+            mode: GAME_MODES.STORY, // NEW: Story mode
+            gradient: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
+            difficulty: 'Matematičke priče'
         },
         {
             mode: GAME_MODES.ADDITION,
@@ -218,6 +230,30 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
 
     const playerStats = playerData?.statistics?.gameModeStats || {};
 
+    // Helper function to get mode icon
+    const getModeIcon = (mode) => {
+        if (mode === GAME_MODES.STORY) {
+            return StoryManager.getStoryModeIcon();
+        }
+        return GameLogic.getGameModeIcon(mode);
+    };
+
+    // Helper function to get mode display name
+    const getModeDisplayName = (mode) => {
+        if (mode === GAME_MODES.STORY) {
+            return StoryManager.getStoryModeDisplayName();
+        }
+        return GameLogic.getGameModeDisplayName(mode);
+    };
+
+    // Helper function to get mode description
+    const getModeDescription = (mode) => {
+        if (mode === GAME_MODES.STORY) {
+            return StoryManager.getStoryModeDescription();
+        }
+        return GameLogic.getGameModeDescription(mode);
+    };
+
     return (
         <div style={containerStyle}>
             {/* Header */}
@@ -241,6 +277,11 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                     const modeStats = playerStats[config.mode] || { gamesPlayed: 0, bestScore: 0 };
                     const [isHovered, setIsHovered] = React.useState(false);
                     
+                    // Special handling for story mode stats
+                    const isStoryMode = config.mode === GAME_MODES.STORY;
+                    const storyStats = isStoryMode ? playerData?.statistics?.storyMode : null;
+                    const storyCount = storyStats ? Object.keys(storyStats).length : 0;
+                    
                     return (
                         <button
                             key={config.mode}
@@ -258,11 +299,11 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                             {/* Header */}
                             <div style={modeHeaderStyle}>
                                 <div style={modeIconStyle}>
-                                    {GameLogic.getGameModeIcon(config.mode)}
+                                    {getModeIcon(config.mode)}
                                 </div>
                                 <div>
                                     <h3 style={modeTitleStyle}>
-                                        {GameLogic.getGameModeDisplayName(config.mode)}
+                                        {getModeDisplayName(config.mode)}
                                     </h3>
                                     <p style={modeDifficultyStyle}>
                                         {config.difficulty}
@@ -272,11 +313,24 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
 
                             {/* FIXED: Description with better visibility */}
                             <p style={modeDescriptionStyle}>
-                                {GameLogic.getGameModeDescription(config.mode)}
+                                {getModeDescription(config.mode)}
                             </p>
 
-                            {/* Player Stats */}
-                            {modeStats.gamesPlayed > 0 && (
+                            {/* Player Stats - Different for story mode */}
+                            {isStoryMode && storyCount > 0 ? (
+                                <div style={modeStatsStyle}>
+                                    <div style={statItemStyle}>
+                                        <div style={statValueStyle}>{storyCount}</div>
+                                        <div style={statLabelStyle}>Priča</div>
+                                    </div>
+                                    <div style={statItemStyle}>
+                                        <div style={statValueStyle}>
+                                            {Object.values(storyStats).filter(s => s.status === 'completed').length}
+                                        </div>
+                                        <div style={statLabelStyle}>Završeno</div>
+                                    </div>
+                                </div>
+                            ) : !isStoryMode && modeStats.gamesPlayed > 0 ? (
                                 <div style={modeStatsStyle}>
                                     <div style={statItemStyle}>
                                         <div style={statValueStyle}>{modeStats.gamesPlayed}</div>
@@ -287,10 +341,10 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                                         <div style={statLabelStyle}>Najbolji</div>
                                     </div>
                                 </div>
-                            )}
+                            ) : null}
 
                             {/* New Mode Indicator */}
-                            {modeStats.gamesPlayed === 0 && (
+                            {((isStoryMode && storyCount === 0) || (!isStoryMode && modeStats.gamesPlayed === 0)) && (
                                 <div style={{
                                     position: 'absolute',
                                     top: '1rem',
@@ -327,7 +381,13 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                         <strong style={{ color: '#f59e0b' }}>⚡ Sprint:</strong> Test brzine s povećanim brojem pitanja
                     </div>
                     <div style={infoItemStyle}>
+                        <strong style={{ color: '#7c3aed' }}>📚 Priče:</strong> Učenje kroz zabavne matematičke avanture
+                    </div>
+                    <div style={infoItemStyle}>
                         <strong style={{ color: '#ef4444' }}>✖️ Množenje:</strong> Savladaj tablice množenja do 12x12
+                    </div>
+                    <div style={infoItemStyle}>
+                        <strong style={{ color: '#f97316' }}>➗ Dijeljenje:</strong> Tablice dijeljenja s korak-po-korak pristupom
                     </div>
                 </div>
             </div>
