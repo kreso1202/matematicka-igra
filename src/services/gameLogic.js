@@ -1,11 +1,98 @@
 import { LEVELS, GAME_MODES, MATH_TIPS } from './gameConfig.js';
 
+// ======================= STORY MODE DODATCI =======================
+// Story Mode teme i priče
+const STORY_THEMES = {
+    PIRATE_ADVENTURE: {
+        name: 'Piratska Avantura',
+        emoji: '🏴‍☠️',
+        background: 'linear-gradient(135deg, #1e3a8a, #3730a3)',
+        characters: ['Kapetan Crna Brk', 'Morska Vučica', 'Papiga Pametnica'],
+        settings: ['piratskom brodu', 'tajanstvenom otoku', 'podvodnoj špilji', 'skrivenom blagu']
+    },
+    SPACE_MISSION: {
+        name: 'Svemirska Misija',
+        emoji: '🚀',
+        background: 'linear-gradient(135deg, #0f172a, #1e1b4b)',
+        characters: ['Astronautkinja Ana', 'Robot ZX-9', 'Vanzemaljac Qyx'],
+        settings: ['svemirskoj stanici', 'crvenom planetu', 'asteroidnom polju', 'galaksiji Andromeda']
+    },
+    FOREST_QUEST: {
+        name: 'Šumska Potraga',
+        emoji: '🌲',
+        background: 'linear-gradient(135deg, #14532d, #166534)',
+        characters: ['Vila Šumska', 'Patuljak Modrolisac', 'Zmaj Zelenkast'],
+        settings: ['čarobnoj šumi', 'kristalnom jezeru', 'planinom vrhu', 'skrivenom hramu']
+    },
+    UNDERWATER_WORLD: {
+        name: 'Podvodni Svijet',
+        emoji: '🐠',
+        background: 'linear-gradient(135deg, #0c4a6e, #0369a1)',
+        characters: ['Morska Sirena Luna', 'Hobotnica Pametna', 'Delfin Brzi'],
+        settings: ['koralnom grebenu', 'dubokom oceanu', 'podvodnom gradu', 'misterioznom vrtlogu']
+    }
+};
+
+const STORY_SCENARIOS = {
+    addition: [
+        "U {setting} je {character} pronašao/la {num1} zlatnih novčića. Malo kasnije je našao/la još {num2} novčića. Koliko novčića ima sada ukupno?",
+        "{character} je u {setting} sakupio/la {num1} magičnih kristala. Prijatelj mu je dao još {num2} kristala. Koliko kristala ima ukupno?",
+        "Dok je istraživao/la {setting}, {character} je vidio/la {num1} čarobnih svjetlošnica. Uskoro se pojavilo još {num2}. Koliko ih je ukupno?",
+        "{character} je imao/la {num1} čarobnih napitaka. Na {setting} je našao/la još {num2}. Koliko napitaka ima sada?"
+    ],
+    subtraction: [
+        "{character} je u {setting} imao/la {num1} zlatnih novčića. Kupio/la je čarobni eliksir za {num2} novčića. Koliko mu je ostalo?",
+        "Na {setting} je živjelo {num1} šarenih riba. {num2} ih je otplivalo u drugu lagunu. Koliko ih je ostalo?",
+        "{character} je sakupio/la {num1} čarobnih bobica. Dao/la je {num2} gladan patuljcima. Koliko bobica mu je ostalo?",
+        "U bitci s morskim čudovištem, {character} je imao/la {num1} čarobnih strijelica. Iskoristio/la je {num2}. Koliko mu je ostalo?"
+    ],
+    multiplication: [
+        "{character} je u {setting} našao/la {num1} škrinja s blagom. U svakoj škrinji je {num2} zlatnika. Koliko zlatnika je ukupno?",
+        "Na {setting} ima {num1} čarobnih stabala. Na svakom stablu raste {num2} zlatna jabuka. Koliko jabuka ima ukupno?",
+        "{character} je vidio/la {num1} grupa morskih dupina. U svakoj grupi je {num2} dupina. Koliko dupina ima ukupno?",
+        "U {setting} je {num1} tornjeva. Svaki toranj ima {num2} kata s blagom. Koliko katova ima ukupno?"
+    ],
+    division: [
+        "{character} je pronašao/la {num1} čarobnih perli i želi ih podijeliti jednako između {num2} prijatelja. Koliko perli će dobiti svaki prijatelj?",
+        "U {setting} je {num1} magičnih napitaka koje treba podijeliti u {num2} jednake grupe. Koliko napitaka će biti u svakoj grupi?",
+        "{character} je sakupio/la {num1} sjajnih dragulaja. Želi ih staviti u {num2} jednake kutije. Koliko dragulja će biti u svakoj kutiji?",
+        "Na {setting} je {num1} čarobnih stvorenja koja se trebaju smjestiti u {num2} različita doma. Koliko stvorenja će biti u svakom domu?"
+    ]
+};
+
+// Funkcija za dobivanje story konteksta
+function getStoryContext(level, operation = 'addition') {
+    const themeKeys = Object.keys(STORY_THEMES);
+    const themeIndex = (level - 1) % themeKeys.length;
+    const currentTheme = STORY_THEMES[themeKeys[themeIndex]];
+    
+    const scenarios = STORY_SCENARIOS[operation] || STORY_SCENARIOS.addition;
+    const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    
+    const randomCharacter = currentTheme.characters[Math.floor(Math.random() * currentTheme.characters.length)];
+    const randomSetting = currentTheme.settings[Math.floor(Math.random() * currentTheme.settings.length)];
+    
+    return {
+        theme: currentTheme,
+        character: randomCharacter,
+        setting: randomSetting,
+        scenario: randomScenario
+    };
+}
+
+// ======================= GLAVNA GAMELOGIC KLASA =======================
 export class GameLogic {
     static getCurrentLevelData(currentLevel) {
         return LEVELS.find(l => l.id === currentLevel);
     }
 
     static generateQuestion(currentLevel, gameMode = GAME_MODES.CLASSIC, difficulty = 'medium') {
+        // ⭐ STORY MODE - Specijalan tretman
+        if (gameMode === GAME_MODES.STORY) {
+            return this.generateStoryQuestion(currentLevel, difficulty);
+        }
+
+        // Postojeća logika za ostale modove...
         const levelData = this.getCurrentLevelData(currentLevel);
         let operations, operation;
         let num1, num2, result, question;
@@ -144,7 +231,87 @@ export class GameLogic {
         return { question, correctAnswer: result };
     }
 
-    // NOVE HELPER FUNKCIJE ZA RANGES - PRILAGOĐENO DJECI DO 3. RAZREDA
+    // ⭐ NOVA FUNKCIJA - Generiranje story pitanja
+    static generateStoryQuestion(level, difficulty = 'medium') {
+        let operation, num1, num2, correctAnswer;
+        
+        // Odaberi operaciju ovisno o nivou
+        if (level <= 2) {
+            operation = 'addition';
+        } else if (level <= 4) {
+            operation = Math.random() < 0.6 ? 'addition' : 'subtraction';
+        } else if (level <= 6) {
+            const ops = ['addition', 'subtraction'];
+            operation = ops[Math.floor(Math.random() * ops.length)];
+        } else {
+            const ops = ['addition', 'subtraction', 'multiplication'];
+            if (level > 8) ops.push('division');
+            operation = ops[Math.floor(Math.random() * ops.length)];
+        }
+        
+        // Generiraj brojeve ovisno o težini
+        const maxNum = this.getMaxNumberForLevel(level, difficulty);
+        
+        switch (operation) {
+            case 'addition':
+                num1 = Math.floor(Math.random() * maxNum) + 1;
+                num2 = Math.floor(Math.random() * maxNum) + 1;
+                correctAnswer = num1 + num2;
+                break;
+                
+            case 'subtraction':
+                num2 = Math.floor(Math.random() * maxNum) + 1;
+                num1 = num2 + Math.floor(Math.random() * maxNum) + 1;
+                correctAnswer = num1 - num2;
+                break;
+                
+            case 'multiplication':
+                num1 = Math.floor(Math.random() * Math.min(12, maxNum)) + 1;
+                num2 = Math.floor(Math.random() * Math.min(12, maxNum)) + 1;
+                correctAnswer = num1 * num2;
+                break;
+                
+            case 'division':
+                correctAnswer = Math.floor(Math.random() * Math.min(12, maxNum)) + 1;
+                num2 = Math.floor(Math.random() * Math.min(12, maxNum)) + 1;
+                num1 = correctAnswer * num2;
+                break;
+        }
+        
+        // Dobij story kontekst
+        const context = getStoryContext(level, operation);
+        
+        // Stvori pitanje s pričom
+        const storyText = context.scenario
+            .replace(/{character}/g, context.character)
+            .replace(/{setting}/g, context.setting)
+            .replace(/{num1}/g, num1)
+            .replace(/{num2}/g, num2);
+        
+        return {
+            question: storyText,
+            correctAnswer,
+            storyContext: context,
+            operation,
+            originalNumbers: { num1, num2 }
+        };
+    }
+
+    // ⭐ NOVA HELPER FUNKCIJA za Story Mode
+    static getMaxNumberForLevel(level, difficulty) {
+        const baseMax = {
+            easy: 10,
+            medium: 20,  
+            hard: 50
+        };
+        
+        const base = baseMax[difficulty] || 20;
+        const levelMultiplier = Math.floor((level - 1) / 3) + 1;
+        
+        return Math.min(base * levelMultiplier, 100);
+    }
+
+    // POSTOJEĆE HELPER FUNKCIJE ZA RANGES - PRILAGOĐENO DJECI DO 3. RAZREDA
     static getAdditionRanges(level, difficulty) {
         const ranges = {
             1: {
@@ -324,6 +491,9 @@ export class GameLogic {
             case GAME_MODES.DIVISION:
                 modeMultiplier = 1.3; // Bonus za teže operacije
                 break;
+            case GAME_MODES.STORY:
+                modeMultiplier = 1.2; // ⭐ Bonus za story mode
+                break;
             case GAME_MODES.ADDITION:
             case GAME_MODES.SUBTRACTION:
                 modeMultiplier = 1.1; // Mali bonus za specifične operacije
@@ -363,7 +533,11 @@ export class GameLogic {
             questionsNeeded = Math.floor(questionsNeeded * 0.8); // Manje pitanja za training
         }
         
-        return Math.min((questionsInLevel / questionsNeeded) * 100, 100);
+        return { 
+            current: questionsInLevel,
+            total: questionsNeeded,
+            percentage: Math.min((questionsInLevel / questionsNeeded) * 100, 100)
+        };
     }
 
     static shouldLevelUp(questionsInLevel, currentLevel, gameMode = GAME_MODES.CLASSIC) {
@@ -419,12 +593,12 @@ export class GameLogic {
                 category = 'division';
                 break;
             default:
-                // Za classic/training/sprint, koristi operaciju iz pitanja
+                // Za classic/training/sprint/story, koristi operaciju iz pitanja
                 category = operationMap[operation] || 'addition';
         }
 
         const tips = MATH_TIPS[category];
-        if (!tips || tips.length === 0) return null;
+        if (!tips || tips.length === 0) return "Pokušaj podijeliti problem na manje dijelove i reši korak po korak.";
 
         // Vrati random savjet iz kategorije
         return tips[Math.floor(Math.random() * tips.length)];
@@ -441,6 +615,7 @@ export class GameLogic {
     static getGameModeDisplayName(gameMode) {
         const displayNames = {
             [GAME_MODES.CLASSIC]: 'Klasična igra',
+            [GAME_MODES.STORY]: 'Avantura s pričom',     // ⭐ DODANO
             [GAME_MODES.TRAINING]: 'Trening',
             [GAME_MODES.SPRINT]: 'Sprint',
             [GAME_MODES.ADDITION]: 'Zbrajanje',
@@ -454,6 +629,7 @@ export class GameLogic {
     static getGameModeDescription(gameMode) {
         const descriptions = {
             [GAME_MODES.CLASSIC]: 'Sve operacije kroz progresivne nivoe',
+            [GAME_MODES.STORY]: 'Uči matematiku kroz uzbudljive priče i avanture!',  // ⭐ DODANO
             [GAME_MODES.TRAINING]: 'Vježbanje bez vremenskog ograničenja',
             [GAME_MODES.SPRINT]: 'Brza igra sa svim operacijama',
             [GAME_MODES.ADDITION]: 'Fokus na zbrajanje brojeva',
@@ -467,6 +643,7 @@ export class GameLogic {
     static getGameModeIcon(gameMode) {
         const icons = {
             [GAME_MODES.CLASSIC]: '🎯',
+            [GAME_MODES.STORY]: '📚',        // ⭐ DODANO
             [GAME_MODES.TRAINING]: '🏋️',
             [GAME_MODES.SPRINT]: '⚡',
             [GAME_MODES.ADDITION]: '➕',
