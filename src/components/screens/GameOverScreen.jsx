@@ -19,6 +19,7 @@ function GameOverScreen({
     const allPlayers = getAllPlayers();
     const playerData = allPlayers[playerName];
     const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+    const showTips = playerData?.statistics?.preferences?.showTips !== false;
     const previousBestScore = playerData?.bestScore || 0;
     const isNewRecord = score > previousBestScore;
 
@@ -26,18 +27,60 @@ function GameOverScreen({
         if (soundEnabled) {
             ThemeManager.playSound('click', true);
         }
-        startGame(gameMode); // Restart same game mode
+        startGame(gameMode);
     };
 
     const handleMenu = () => {
         if (soundEnabled) {
             ThemeManager.playSound('click', true);
         }
-        // Clear achievement notifications when going to menu
         if (setNewAchievements) {
             setNewAchievements([]);
         }
         setGameState(GAME_STATES.MENU);
+    };
+
+    // Get performance-based tip
+    const getPerformanceTip = () => {
+        if (!showTips) return null;
+        
+        const accuracy = sessionStats.correct + sessionStats.wrong + sessionStats.timeouts > 0 
+            ? sessionStats.correct / (sessionStats.correct + sessionStats.wrong + sessionStats.timeouts)
+            : 0;
+
+        // Determine which operation type had most errors based on game mode
+        let tipCategory = 'addition'; // default
+        switch (gameMode) {
+            case GAME_MODES.MULTIPLICATION:
+                tipCategory = 'multiplication';
+                break;
+            case GAME_MODES.DIVISION:
+                tipCategory = 'division';
+                break;
+            case GAME_MODES.SUBTRACTION:
+                tipCategory = 'subtraction';
+                break;
+            case GAME_MODES.ADDITION:
+                tipCategory = 'addition';
+                break;
+            default:
+                // For classic/training/sprint, choose based on performance or random
+                const categories = ['addition', 'subtraction', 'multiplication', 'division'];
+                tipCategory = categories[Math.floor(Math.random() * categories.length)];
+        }
+
+        return GameLogic.getMathTip('+', gameMode); // Get tip for the category
+    };
+
+    const getMotivationMessage = () => {
+        const accuracy = sessionStats.correct + sessionStats.wrong + sessionStats.timeouts > 0 
+            ? Math.round((sessionStats.correct / (sessionStats.correct + sessionStats.wrong + sessionStats.timeouts)) * 100)
+            : 0;
+
+        if (isNewRecord) return "🎉 Novi rekord! Odličan napredak!";
+        if (accuracy >= 80) return "💪 Izvrsno! Nastavi ovako!";
+        if (accuracy >= 60) return "👍 Dobro! Možeš još bolje!";
+        return "💪 Nastavi vježbati, postajat ćeš sve bolji!";
     };
 
     // Inline styles
@@ -150,6 +193,43 @@ function GameOverScreen({
         margin: 0
     };
 
+    const motivationMessageStyle = {
+        backgroundColor: '#ede9fe',
+        color: '#5b21b6',
+        padding: '1rem',
+        borderRadius: '0.5rem',
+        fontSize: '0.875rem',
+        marginBottom: '1rem',
+        fontStyle: 'italic'
+    };
+
+    // NEW: Math tip styling
+    const mathTipContainerStyle = {
+        backgroundColor: '#f0f9ff',
+        border: '2px solid #0ea5e9',
+        borderRadius: '0.75rem',
+        padding: '1.5rem',
+        marginBottom: '1.5rem',
+        textAlign: 'left'
+    };
+
+    const mathTipTitleStyle = {
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        color: '#0369a1',
+        margin: '0 0 0.75rem 0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
+    };
+
+    const mathTipTextStyle = {
+        fontSize: '0.875rem',
+        color: '#0c4a6e',
+        lineHeight: '1.5',
+        margin: 0
+    };
+
     const buttonContainerStyle = {
         display: 'flex',
         flexDirection: 'column',
@@ -183,28 +263,12 @@ function GameOverScreen({
         fontFamily: 'inherit'
     };
 
-    const motivationMessageStyle = {
-        backgroundColor: '#ede9fe',
-        color: '#5b21b6',
-        padding: '1rem',
-        borderRadius: '0.5rem',
-        fontSize: '0.875rem',
-        marginBottom: '1rem',
-        fontStyle: 'italic'
-    };
-
     const gameModeName = GameLogic.getGameModeDisplayName(gameMode);
     const accuracy = sessionStats.correct + sessionStats.wrong + sessionStats.timeouts > 0 
         ? Math.round((sessionStats.correct / (sessionStats.correct + sessionStats.wrong + sessionStats.timeouts)) * 100)
         : 0;
 
-    // Motivational messages based on performance
-    const getMotivationMessage = () => {
-        if (isNewRecord) return "🎉 Novi rekord! Odličan napredak!";
-        if (accuracy >= 80) return "💪 Izvrsno! Nastavi ovako!";
-        if (accuracy >= 60) return "👍 Dobro! Možeš još bolje!";
-        return "💪 Nastavi vježbati, postajat ćeš sve bolji!";
-    };
+    const performanceTip = getPerformanceTip();
 
     return (
         <div style={containerStyle}>
@@ -225,11 +289,7 @@ function GameOverScreen({
                 <div style={achievementNotificationStyle}>
                     <h3 style={achievementTitleStyle}>🏆 Nova postignuća!</h3>
                     <p style={achievementListStyle}>
-                        {newAchievements.map(id => {
-                            const achievement = Object.values(require('../../services/gameConfig.js').ACHIEVEMENTS)
-                                .find(a => a.id === id);
-                            return achievement?.name;
-                        }).filter(Boolean).join(', ')}
+                        Odličan posao! Otključali ste nova postignuća.
                     </p>
                 </div>
             )}
@@ -277,6 +337,19 @@ function GameOverScreen({
                     </div>
                 )}
             </div>
+
+            {/* NEW: Math Tip Based on Performance */}
+            {performanceTip && (
+                <div style={mathTipContainerStyle}>
+                    <h3 style={mathTipTitleStyle}>
+                        <span>💡</span>
+                        <span>Savjet za poboljšanje:</span>
+                    </h3>
+                    <p style={mathTipTextStyle}>
+                        {performanceTip}
+                    </p>
+                </div>
+            )}
 
             {/* Action Buttons */}
             <div style={buttonContainerStyle}>
