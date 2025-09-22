@@ -7,6 +7,9 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
     const allPlayers = getAllPlayers();
     const playerData = allPlayers[playerName];
     const soundEnabled = playerData?.statistics?.preferences?.soundEnabled !== false;
+    
+    // Get current theme for dynamic styling
+    const currentTheme = playerData?.statistics?.preferences?.theme || 'default';
 
     const handleGameModeSelect = (mode) => {
         if (soundEnabled) {
@@ -69,13 +72,13 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
     const titleStyle = {
         fontSize: '2rem',
         fontWeight: 'bold',
-        color: '#1f2937',
+        color: 'var(--text-primary, #1f2937)',
         margin: '0 0 0.5rem 0'
     };
 
     const subtitleStyle = {
         fontSize: '1.125rem',
-        color: '#6b7280',
+        color: 'var(--text-secondary, #6b7280)',
         margin: 0
     };
 
@@ -146,11 +149,14 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
         margin: 0
     };
 
+    // FIXED: Better text visibility for all themes
     const modeDescriptionStyle = {
         fontSize: '1rem',
         lineHeight: '1.5',
-        opacity: 0.95,
-        marginBottom: '1.5rem'
+        opacity: 0.98, // Increased opacity for better readability
+        marginBottom: '1.5rem',
+        color: 'rgba(255, 255, 255, 0.95)', // Explicit white color with high opacity
+        textShadow: currentTheme === 'dark' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none' // Add shadow for dark themes
     };
 
     const modeStatsStyle = {
@@ -177,6 +183,37 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
         fontSize: '0.75rem',
         opacity: 0.8,
         margin: 0
+    };
+
+    // FIXED: Better visibility for info section
+    const infoSectionStyle = {
+        backgroundColor: 'var(--bg-card, #ffffff)',
+        padding: '1.5rem',
+        borderRadius: '0.75rem',
+        border: '1px solid var(--border-color, #e5e7eb)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+    };
+
+    const infoTitleStyle = {
+        fontSize: '1.125rem',
+        fontWeight: 'bold',
+        marginBottom: '1rem',
+        color: 'var(--text-primary, #1f2937)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
+    };
+
+    const infoGridStyle = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1rem',
+        fontSize: '0.875rem',
+        color: 'var(--text-secondary, #6b7280)' // Use CSS variable for theme support
+    };
+
+    const infoItemStyle = {
+        lineHeight: '1.5'
     };
 
     const playerStats = playerData?.statistics?.gameModeStats || {};
@@ -233,7 +270,7 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                                 </div>
                             </div>
 
-                            {/* Description */}
+                            {/* FIXED: Description with better visibility */}
                             <p style={modeDescriptionStyle}>
                                 {GameLogic.getGameModeDescription(config.mode)}
                             </p>
@@ -273,43 +310,23 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                 })}
             </div>
 
-            {/* Info Section */}
-            <div style={{
-                backgroundColor: 'white',
-                padding: '1.5rem',
-                borderRadius: '0.75rem',
-                border: '1px solid #e5e7eb',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }}>
-                <h3 style={{
-                    fontSize: '1.125rem',
-                    fontWeight: 'bold',
-                    marginBottom: '1rem',
-                    color: '#1f2937',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                }}>
+            {/* FIXED: Info Section with theme-aware colors */}
+            <div style={infoSectionStyle}>
+                <h3 style={infoTitleStyle}>
                     💡 Savjeti za različite načine
                 </h3>
 
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                    gap: '1rem',
-                    fontSize: '0.875rem',
-                    color: '#6b7280'
-                }}>
-                    <div>
+                <div style={infoGridStyle}>
+                    <div style={infoItemStyle}>
                         <strong style={{ color: '#3b82f6' }}>🎯 Klasična:</strong> Najbolji način za napredovanje kroz sve nivoe
                     </div>
-                    <div>
+                    <div style={infoItemStyle}>
                         <strong style={{ color: '#10b981' }}>🏋️ Trening:</strong> Vježbaj bez pritiska vremena
                     </div>
-                    <div>
+                    <div style={infoItemStyle}>
                         <strong style={{ color: '#f59e0b' }}>⚡ Sprint:</strong> Test brzine s povećanim brojem pitanja
                     </div>
-                    <div>
+                    <div style={infoItemStyle}>
                         <strong style={{ color: '#ef4444' }}>✖️ Množenje:</strong> Savladaj tablice množenja do 12x12
                     </div>
                 </div>
