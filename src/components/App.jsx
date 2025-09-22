@@ -136,6 +136,8 @@ function App() {
     const [gameStartTime, setGameStartTime] = useState(null);
     const [maxStreak, setMaxStreak] = useState(0);
     const [newAchievements, setNewAchievements] = useState([]);
+    const [fastestAnswerTime, setFastestAnswerTime] = useState(null);
+    const [questionStartTime, setQuestionStartTime] = useState(null);
     
     // UI state
     const [isOnline, setIsOnline] = useState(true);
@@ -214,6 +216,7 @@ function App() {
         setCurrentQuestion(question);
         setCorrectAnswer(answer);
         setTimeLeft(levelData.timeLimit);
+        setQuestionStartTime(Date.now()); // Track kada je pitanje postavljeno
     };
 
     const startGame = (selectedGameMode = GAME_MODES.CLASSIC) => {
@@ -233,6 +236,8 @@ function App() {
         setCorrectAnswer(0);    // Resetiraj točan odgovor
         setSessionStats({ correct: 0, wrong: 0, timeouts: 0 });
         setGameStartTime(Date.now());
+        setFastestAnswerTime(null);
+        setQuestionStartTime(null);
         
         console.log('⏳ Čekam 100ms prije generiranja pitanja...'); // Debug
         
@@ -266,17 +271,23 @@ function App() {
 
     const checkAnswer = () => {
         const userAnswer = parseInt(answer);
+        const answerTime = questionStartTime ? (Date.now() - questionStartTime) / 1000 : null;
         
         console.log('✅ Provjeravam:', userAnswer, 'vs', correctAnswer); // Debug log
         
+        // Track fastest answer time
+        if (answerTime && (!fastestAnswerTime || answerTime < fastestAnswerTime)) {
+            setFastestAnswerTime(answerTime);
+        }
+        
         if (userAnswer === correctAnswer) {
-            handleCorrectAnswer();
+            handleCorrectAnswer(answerTime);
         } else {
             handleWrongAnswer();
         }
     };
 
-    const handleCorrectAnswer = () => {
+    const handleCorrectAnswer = (answerTime) => {
         // Dobij difficulty iz player preferences
         const allPlayers = getAllPlayers();
         const playerData = allPlayers[playerName];
@@ -385,10 +396,11 @@ function App() {
             currentLevel, 
             sessionStatsWithStreak,
             gameTime,
-            gameMode
+            gameMode,
+            fastestAnswerTime // Pass fastest answer time for tracking
         );
 
-        // Provjeri achievements
+        // Provjeri achievements - FIXED: Pass correct parameters
         const playerData = updatedPlayerData[playerName];
         const achievementResult = AchievementManager.checkAchievements(
             playerData, 
@@ -437,7 +449,8 @@ function App() {
                 levelStats: {},
                 dailyStats: {},
                 achievements: { unlocked: [], progress: {} },
-                preferences: {}
+                preferences: {},
+                fastestAnswer: null
             }
         };
         
