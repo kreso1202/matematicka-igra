@@ -503,7 +503,7 @@ export class PlayerManager {
             .slice(0, limit);
     }
 
-    static updatePlayerData(allPlayers, playerName, score, currentLevel, sessionStats, gameTime = 0, gameMode = GAME_MODES.CLASSIC, preferences = {}) {
+    static updatePlayerData(allPlayers, playerName, score, currentLevel, sessionStats, gameTime = 0, gameMode = GAME_MODES.CLASSIC, fastestAnswerTime = null, preferences = {}) {
         const existing = allPlayers[playerName] || {
             name: playerName,
             bestScore: 0,
@@ -520,6 +520,7 @@ export class PlayerManager {
                 dailyStats: {},
                 gameModeStats: {}, // Nova statistika po game mode-u
                 achievements: { unlocked: [], progress: {} },
+                fastestAnswer: null, // NEW: Track fastest answer time
                 preferences: {
                     theme: 'default',
                     avatar: 'robot',
@@ -536,6 +537,12 @@ export class PlayerManager {
         const newTotalCorrect = existing.statistics.totalCorrectAnswers + sessionStats.correct;
         const newTotalQuestions = existing.statistics.totalQuestionsAnswered + totalQuestions;
         
+        // NEW: Update fastest answer time
+        const currentFastest = existing.statistics.fastestAnswer;
+        const newFastestAnswer = fastestAnswerTime && (!currentFastest || fastestAnswerTime < currentFastest) 
+            ? fastestAnswerTime 
+            : currentFastest;
+        
         const newStats = {
             ...existing.statistics,
             totalTimeSpent: existing.statistics.totalTimeSpent + gameTime,
@@ -543,6 +550,7 @@ export class PlayerManager {
             totalCorrectAnswers: newTotalCorrect,
             averageAccuracy: newTotalQuestions > 0 ? (newTotalCorrect / newTotalQuestions * 100) : 0,
             bestStreak: Math.max(existing.statistics.bestStreak || 0, sessionStats.maxStreak || 0),
+            fastestAnswer: newFastestAnswer, // NEW: Add fastest answer tracking
             levelStats: {
                 ...existing.statistics.levelStats,
                 [currentLevel]: {
@@ -579,7 +587,8 @@ export class PlayerManager {
             level: currentLevel,
             gameMode: gameMode,
             stats: sessionStats,
-            gameTime: gameTime
+            gameTime: gameTime,
+            fastestAnswer: fastestAnswerTime // NEW: Include fastest answer in results
         };
 
         return {
