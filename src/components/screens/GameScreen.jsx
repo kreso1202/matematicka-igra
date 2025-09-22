@@ -17,9 +17,16 @@ function GameScreen({
     gameMode,
     getLevelProgress, 
     checkAnswer,
-    setGameState 
+    setGameState,
+    playerName,
+    getAllPlayers 
 }) {
     const [inputFocused, setInputFocused] = useState(false);
+    
+    // Get player preferences for tips
+    const allPlayers = getAllPlayers();
+    const playerData = allPlayers[playerName];
+    const showTips = playerData?.statistics?.preferences?.showTips !== false;
 
     useEffect(() => {
         const handleKeyPress = (e) => {
@@ -34,16 +41,15 @@ function GameScreen({
 
     // Inline stilovi za suženi layout
     const containerStyle = {
-        maxWidth: '600px',  // Ograničena širina za fokus
+        maxWidth: '600px',
         margin: '0 auto',
-        padding: '1rem', // Smanjeni padding za mobile
+        padding: '1rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
 
-    // FIXED: Mobile-responsive header
     const headerStyle = {
         display: 'flex',
-        flexDirection: 'column', // Stack vertically on mobile
+        flexDirection: 'column',
         gap: '1rem',
         marginBottom: '1.5rem',
         padding: '1rem',
@@ -52,12 +58,11 @@ function GameScreen({
         border: '1px solid #e5e7eb'
     };
 
-    // FIXED: Mobile-responsive game info
     const gameInfoStyle = {
         display: 'flex',
-        flexWrap: 'wrap', // Allow wrapping on small screens
+        flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: '0.75rem', // Smaller gap for mobile
+        gap: '0.75rem',
         fontSize: '0.875rem',
         color: '#6b7280'
     };
@@ -67,7 +72,7 @@ function GameScreen({
         flexDirection: 'column',
         alignItems: 'center',
         gap: '0.25rem',
-        minWidth: 'auto' // Allow flexible sizing
+        minWidth: 'auto'
     };
 
     const infoLabelStyle = {
@@ -78,12 +83,11 @@ function GameScreen({
     };
 
     const infoValueStyle = {
-        fontSize: '1rem', // Slightly smaller for mobile
+        fontSize: '1rem',
         fontWeight: 'bold',
         color: '#1f2937'
     };
 
-    // FIXED: Better positioned exit button
     const exitButtonContainerStyle = {
         display: 'flex',
         justifyContent: 'center',
@@ -99,23 +103,22 @@ function GameScreen({
         fontSize: '0.875rem',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        maxWidth: '120px' // Ensure it fits on mobile
+        maxWidth: '120px'
     };
 
-    // Glavni dio s pitanjem
     const questionContainerStyle = {
         backgroundColor: 'white',
         borderRadius: '1.5rem',
-        padding: '2rem 1rem', // Reduced horizontal padding for mobile
+        padding: '2rem 1rem',
         textAlign: 'center',
         boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
         border: '1px solid #e5e7eb',
         marginBottom: '1.5rem',
-        minHeight: '280px', // Reduced for mobile
+        minHeight: '280px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        gap: '1.5rem' // Smaller gap for mobile
+        gap: '1.5rem'
     };
 
     const levelIndicatorStyle = {
@@ -123,13 +126,13 @@ function GameScreen({
         alignItems: 'center',
         justifyContent: 'center',
         gap: '0.5rem',
-        fontSize: '0.875rem', // Smaller for mobile
+        fontSize: '0.875rem',
         color: '#6b7280',
         marginBottom: '1rem'
     };
 
     const questionStyle = {
-        fontSize: '2.5rem', // Smaller for mobile
+        fontSize: '2.5rem',
         fontWeight: 'bold',
         color: '#1f2937',
         margin: '0',
@@ -144,14 +147,14 @@ function GameScreen({
     };
 
     const answerInputStyle = {
-        fontSize: '1.5rem', // Smaller for mobile
+        fontSize: '1.5rem',
         fontWeight: 'bold',
-        padding: '0.75rem 1rem', // Smaller padding
+        padding: '0.75rem 1rem',
         border: `3px solid ${inputFocused ? '#3b82f6' : '#d1d5db'}`,
         borderRadius: '1rem',
         textAlign: 'center',
-        width: '150px', // Smaller width for mobile
-        maxWidth: '90%', // Responsive max width
+        width: '150px',
+        maxWidth: '90%',
         outline: 'none',
         transition: 'all 0.2s ease',
         backgroundColor: showFeedback ? (showFeedback === FEEDBACK_TYPES.CORRECT ? '#d1fae5' : '#fee2e2') : 'white'
@@ -161,7 +164,7 @@ function GameScreen({
         background: 'linear-gradient(135deg, #10b981, #047857)',
         color: 'white',
         border: 'none',
-        padding: '0.75rem 1.5rem', // Smaller for mobile
+        padding: '0.75rem 1.5rem',
         fontSize: '1rem',
         fontWeight: '600',
         borderRadius: '0.75rem',
@@ -172,8 +175,15 @@ function GameScreen({
         boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
     };
 
+    const feedbackContainerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem'
+    };
+
     const feedbackStyle = {
-        fontSize: '1.25rem', // Smaller for mobile
+        fontSize: '1.25rem',
         fontWeight: 'bold',
         padding: '1rem',
         borderRadius: '0.75rem',
@@ -185,11 +195,29 @@ function GameScreen({
             : 'linear-gradient(135deg, #f59e0b, #d97706)'
     };
 
-    // Progress sekcija
+    // NEW: Math tip styling
+    const mathTipStyle = {
+        backgroundColor: '#ede9fe',
+        color: '#6b21a8',
+        padding: '1rem',
+        borderRadius: '0.75rem',
+        fontSize: '0.875rem',
+        lineHeight: '1.4',
+        textAlign: 'center',
+        border: '2px solid #c4b5fd',
+        maxWidth: '400px',
+        margin: '0 auto'
+    };
+
+    const tipIconStyle = {
+        fontSize: '1.25rem',
+        marginRight: '0.5rem'
+    };
+
     const progressStyle = {
         backgroundColor: 'white',
         borderRadius: '1rem',
-        padding: '1rem', // Smaller padding for mobile
+        padding: '1rem',
         border: '1px solid #e5e7eb'
     };
 
@@ -198,12 +226,12 @@ function GameScreen({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '1rem',
-        flexWrap: 'wrap', // Allow wrapping on mobile
+        flexWrap: 'wrap',
         gap: '0.5rem'
     };
 
     const progressTitleStyle = {
-        fontSize: '0.875rem', // Smaller for mobile
+        fontSize: '0.875rem',
         fontWeight: '600',
         color: '#1f2937'
     };
@@ -225,7 +253,7 @@ function GameScreen({
     };
 
     const hintStyle = {
-        fontSize: '0.75rem', // Smaller for mobile
+        fontSize: '0.75rem',
         color: '#6b7280'
     };
 
@@ -252,9 +280,20 @@ function GameScreen({
         return '#10b981';
     };
 
+    // NEW: Get math tip for wrong answers
+    const getMathTip = () => {
+        if (!showTips || showFeedback !== FEEDBACK_TYPES.WRONG) return null;
+        
+        const operation = GameLogic.getOperationFromQuestion(currentQuestion);
+        const tip = GameLogic.getMathTip(operation, gameMode);
+        return tip;
+    };
+
+    const mathTip = getMathTip();
+
     return (
         <div style={containerStyle}>
-            {/* FIXED: Mobile-responsive header */}
+            {/* Mobile-responsive header */}
             <div style={headerStyle}>
                 <div style={gameInfoStyle}>
                     <div style={infoItemStyle}>
@@ -285,7 +324,6 @@ function GameScreen({
                     )}
                 </div>
                 
-                {/* FIXED: Centered exit button */}
                 <div style={exitButtonContainerStyle}>
                     <button
                         onClick={() => setGameState(GAME_STATES.MENU)}
@@ -347,8 +385,18 @@ function GameScreen({
                         </div>
                     </div>
                 ) : (
-                    <div style={feedbackStyle}>
-                        {getFeedbackText()}
+                    <div style={feedbackContainerStyle}>
+                        <div style={feedbackStyle}>
+                            {getFeedbackText()}
+                        </div>
+                        
+                        {/* NEW: Math tip display for wrong answers */}
+                        {mathTip && (
+                            <div style={mathTipStyle}>
+                                <span style={tipIconStyle}>💡</span>
+                                <strong>Savjet:</strong> {mathTip}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
