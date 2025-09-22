@@ -25,6 +25,11 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
             difficulty: 'Svi nivoi'
         },
         {
+            mode: GAME_MODES.STORY,
+            gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+            difficulty: 'Avantura s pričom'
+        },
+        {
             mode: GAME_MODES.TRAINING,
             gradient: 'linear-gradient(135deg, #10b981, #047857)',
             difficulty: 'Bez vremena'
@@ -321,6 +326,9 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                         <strong style={{ color: '#3b82f6' }}>🎯 Klasična:</strong> Najbolji način za napredovanje kroz sve nivoe
                     </div>
                     <div style={infoItemStyle}>
+                        <strong style={{ color: '#8b5cf6' }}>📚 Priča:</strong> Uči matematiku kroz uzbudljive avanture i priče
+                    </div>
+                    <div style={infoItemStyle}>
                         <strong style={{ color: '#10b981' }}>🏋️ Trening:</strong> Vježbaj bez pritiska vremena
                     </div>
                     <div style={infoItemStyle}>
@@ -328,6 +336,9 @@ function GameModesScreen({ playerName, setGameState, startGame, getAllPlayers })
                     </div>
                     <div style={infoItemStyle}>
                         <strong style={{ color: '#ef4444' }}>✖️ Množenje:</strong> Savladaj tablice množenja do 12x12
+                    </div>
+                    <div style={infoItemStyle}>
+                        <strong style={{ color: '#06b6d4' }}>➕ Zbrajanje:</strong> Fokus na zbrajanje i sabiranje brojeva
                     </div>
                 </div>
             </div>
