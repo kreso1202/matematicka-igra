@@ -211,13 +211,15 @@ function App() {
         }); // Debug
         
         const { question, correctAnswer: answer } = GameLogic.generateQuestion(activeLevel, activeGameMode, difficulty);
-        const levelData = GameLogic.getCurrentLevelData(activeLevel);
         
-        console.log('🎯 Generiram pitanje:', question, '= ?', answer, 'Mode:', activeGameMode, 'Level:', activeLevel, 'Difficulty:', difficulty); // Debug log
+        // ⭐ KORISTI NOVO VREMENSKO OGRANIČENJE ZA STORY MODE
+        const timeLimit = GameLogic.getTimeLimitForMode(activeLevel, activeGameMode, difficulty);
+        
+        console.log('🎯 Generiram pitanje:', question, '= ?', answer, 'Mode:', activeGameMode, 'Level:', activeLevel, 'Time:', timeLimit + 's'); // Debug log
         
         setCurrentQuestion(question);
         setCorrectAnswer(answer);
-        setTimeLeft(levelData.timeLimit);
+        setTimeLeft(timeLimit); // ⭐ KORISTI NOVO VRIJEME
         setQuestionStartTime(Date.now()); // Track kada je pitanje postavljeno
     };
 
