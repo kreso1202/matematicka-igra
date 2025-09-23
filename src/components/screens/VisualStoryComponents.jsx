@@ -258,22 +258,34 @@ export function LevelProgress({ current, total, levelName }) {
                 }} />
             </div>
             
-            {/* Zvjezdice za pokazivanje napretka */}
+            {/* POPRAVKA: Responsive prikaz zvjezdica s ograničenjem */}
             <div style={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
                 marginTop: '0.5rem',
-                gap: '0.25rem' 
+                gap: '0.25rem',
+                flexWrap: 'wrap', // ⭐ DODANO - omogućuje prelom u novi red
+                maxWidth: '100%',
+                overflow: 'hidden' // ⭐ DODANO - sprječava izlaženje
             }}>
-                {[...Array(total)].map((_, i) => (
+                {[...Array(Math.min(total, 15))].map((_, i) => ( // ⭐ OGRANIČENO na max 15 zvjezdica
                     <span key={i} style={{
-                        fontSize: '1rem',
+                        fontSize: total > 10 ? '0.875rem' : '1rem', // ⭐ Manje zvjezdice za veće brojeve
                         color: i < current ? '#fbbf24' : 'rgba(255,255,255,0.3)',
                         transition: 'color 0.3s ease'
                     }}>
                         ⭐
                     </span>
                 ))}
+                {total > 15 && ( // ⭐ DODANO - pokazuje "..." ako ima previše zvjezdica
+                    <span style={{
+                        fontSize: '0.875rem',
+                        color: 'rgba(255,255,255,0.6)',
+                        fontWeight: 'bold'
+                    }}>
+                        ...
+                    </span>
+                )}
             </div>
         </div>
     );
