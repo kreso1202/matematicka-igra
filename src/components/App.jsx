@@ -5,19 +5,19 @@ import { CloudStorage, LocalStorage } from '../services/cloudStorage.js';
 import { GameLogic, PlayerManager } from '../services/gameLogic.js';
 import { AchievementManager } from '../services/achievementManager.js';
 import { ThemeManager } from '../services/themeManager.js';
-import WelcomeScreen from './screens/WelcomeScreen.jsx';
-import MenuScreen from './screens/MenuScreen.jsx';
-import GameModesScreen from './screens/GameModesScreen.jsx';
-import GameScreen from './screens/GameScreen.jsx';
-import StoryGameScreen from './screens/StoryGameScreen.jsx';  // ⭐ NOVO!
-import LevelCompleteScreen from './screens/LevelCompleteScreen.jsx';
-import GameOverScreen from './screens/GameOverScreen.jsx';
-import LeaderboardScreen from './screens/LeaderboardScreen.jsx';
-import StatisticsScreen from './screens/StatisticsScreen.jsx';
-import AchievementsScreen from './screens/AchievementsScreen.jsx';
-import SettingsScreen from './screens/SettingsScreen.jsx';
-import CloudStatus from './common/CloudStatus.jsx';
-import { Cloud } from './Icons.jsx';
+import WelcomeScreen from './components/screens/WelcomeScreen.jsx';
+import MenuScreen from './components/screens/MenuScreen.jsx';
+import GameModesScreen from './components/screens/GameModesScreen.jsx';
+import GameScreen from './components/screens/GameScreen.jsx';
+import EnhancedStoryGameScreen from './components/screens/EnhancedStoryGameScreen.jsx';  // ⭐ AŽURIRANO!
+import LevelCompleteScreen from './components/screens/LevelCompleteScreen.jsx';
+import GameOverScreen from './components/screens/GameOverScreen.jsx';
+import LeaderboardScreen from './components/screens/LeaderboardScreen.jsx';
+import StatisticsScreen from './components/screens/StatisticsScreen.jsx';
+import AchievementsScreen from './components/screens/AchievementsScreen.jsx';
+import SettingsScreen from './components/screens/SettingsScreen.jsx';
+import CloudStatus from './components/common/CloudStatus.jsx';
+import { Cloud } from './components/Icons.jsx';
 
 // CSS stilovi direktno u komponenti
 const appStyles = `
@@ -619,9 +619,9 @@ function App() {
                 {gameState === GAME_STATES.MENU && <MenuScreen {...commonProps} />}
                 {gameState === GAME_STATES.GAME_MODES && <GameModesScreen {...commonProps} />}
                 
-                {/* ⭐ AŽURIRANO RENDERIRANJE ZA STORY MODE */}
+                {/* ⭐ AŽURIRANO RENDERIRANJE ZA ENHANCED STORY MODE */}
                 {gameState === GAME_STATES.PLAYING && gameMode === GAME_MODES.STORY && (
-                    <StoryGameScreen {...gameProps} />
+                    <EnhancedStoryGameScreen {...gameProps} />
                 )}
                 {gameState === GAME_STATES.PLAYING && gameMode !== GAME_MODES.STORY && (
                     <GameScreen {...gameProps} />
