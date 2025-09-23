@@ -297,6 +297,45 @@ export class GameLogic {
         };
     }
 
+    static getCurrentLevelData(currentLevel) {
+        const levelData = LEVELS.find(l => l.id === currentLevel);
+        
+        // ⭐ POSEBNO POBOLJŠANJE ZA STORY MODE - Duža vremena za čitanje
+        // Ova metoda se poziva kada se postavlja timeLeft u App.jsx
+        return levelData;
+    }
+
+    // ⭐ NOVA FUNKCIJA za dobivanje vremenskog ograničenja s obzirom na game mode
+    static getTimeLimitForMode(level, gameMode, difficulty = 'medium') {
+        const levelData = this.getCurrentLevelData(level);
+        let baseTimeLimit = levelData.timeLimit;
+        
+        // Prilagodi vrijeme ovisno o težini
+        if (levelData.difficulty && levelData.difficulty[difficulty]) {
+            baseTimeLimit = levelData.difficulty[difficulty].timeLimit;
+        }
+        
+        // ⭐ STORY MODE - Dodaj dodatno vrijeme za čitanje priče
+        if (gameMode === GAME_MODES.STORY) {
+            let storyBonus = 0;
+            
+            // Više bonusa za niže nivoe (djeca trebaju više vremena za čitanje)
+            if (level <= 2) {
+                storyBonus = 25; // +25 sekundi za prve nivoe
+            } else if (level <= 4) {
+                storyBonus = 20; // +20 sekundi za srednje nivoe  
+            } else if (level <= 6) {
+                storyBonus = 15; // +15 sekundi za više nivoe
+            } else {
+                storyBonus = 10; // +10 sekundi za najviše nivoe
+            }
+            
+            return baseTimeLimit + storyBonus;
+        }
+        
+        return baseTimeLimit;
+    }
+
     // ⭐ NOVA HELPER FUNKCIJA za Story Mode
     static getMaxNumberForLevel(level, difficulty) {
         const baseMax = {
