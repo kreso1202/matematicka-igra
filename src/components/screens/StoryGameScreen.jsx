@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { FEEDBACK_TYPES, GAME_MODES } from '../../services/gameConfig.js';
+import { FEEDBACK_TYPES, GAME_MODES, GAME_STATES } from '../../services/gameConfig.js';
 import { GameLogic } from '../../services/gameLogic.js';
 
 function StoryGameScreen({ 
