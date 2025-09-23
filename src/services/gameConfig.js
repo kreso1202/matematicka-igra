@@ -8,6 +8,7 @@ export const JSONBIN_CONFIG = {
 // Game Modes
 export const GAME_MODES = {
     CLASSIC: 'classic',
+    STORY: 'story',          // ⭐ DODANO SAMO OVO
     TRAINING: 'training',
     SPRINT: 'sprint',
     MULTIPLICATION: 'multiplication',
