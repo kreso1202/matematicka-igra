@@ -23,6 +23,7 @@ function StoryGameScreen({
 }) {
     const inputRef = useRef(null);
     const [storyContext, setStoryContext] = React.useState(null);
+    const [currentTip, setCurrentTip] = React.useState(null); // ⭐ DODANO za stabilan savjet
 
     useEffect(() => {
         if (inputRef.current) {
@@ -36,6 +37,16 @@ function StoryGameScreen({
             setStoryContext(currentQuestion.storyContext);
         }
     }, [currentQuestion]);
+
+    // ⭐ GENERIRAJ STABILAN SAVJET SAMO JEDNOM kad se prikaže greška
+    useEffect(() => {
+        if (showFeedback === FEEDBACK_TYPES.WRONG && !currentTip) {
+            const tip = GameLogic.getMathTip(currentQuestion, gameMode);
+            setCurrentTip(tip);
+        } else if (!showFeedback) {
+            setCurrentTip(null); // Resetiraj kada nema feedback-a
+        }
+    }, [showFeedback, currentTip]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -266,7 +277,7 @@ function StoryGameScreen({
                     emoji: '❌',
                     title: 'Oops!',
                     message: `Netočno. Točan odgovor je ${correctAnswer}`,
-                    tip: showTips ? GameLogic.getMathTip(currentQuestion, correctAnswer) : null
+                    tip: showTips ? currentTip : null // ⭐ KORISTI STABILAN TIP
                 };
             case FEEDBACK_TYPES.TIMEOUT:
                 return {
@@ -284,7 +295,16 @@ function StoryGameScreen({
             {/* Story Header s temom */}
             <div style={storyHeaderStyle}>
                 <button
-                    onClick={() => setGameState('MENU')}
+                    onClick={() => {
+                        console.log('🔴 Kliknuo izlaz iz Story Mode');
+                        
+                        // Reset game state komponente ako postoje
+                        if (typeof setAnswer === 'function') setAnswer('');
+                        
+                        // Postavi state na MENU
+                        console.log('🔴 Pozivam setGameState s MENU:', GAME_STATES.MENU);
+                        setGameState(GAME_STATES.MENU);
+                    }}
                     style={exitButtonStyle}
                     onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.3)'}
                     onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.2)'}
