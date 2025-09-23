@@ -1,3 +1,4 @@
+// Kompletni App.jsx - zamijenite postojeći file
 import { useState, useEffect } from 'react';
 import { GAME_STATES, FEEDBACK_TYPES, GAME_MODES } from '../services/gameConfig.js';
 import { CloudStorage, LocalStorage } from '../services/cloudStorage.js';
@@ -8,6 +9,7 @@ import WelcomeScreen from './screens/WelcomeScreen.jsx';
 import MenuScreen from './screens/MenuScreen.jsx';
 import GameModesScreen from './screens/GameModesScreen.jsx';
 import GameScreen from './screens/GameScreen.jsx';
+import StoryGameScreen from './screens/StoryGameScreen.jsx';  // ⭐ NOVO!
 import LevelCompleteScreen from './screens/LevelCompleteScreen.jsx';
 import GameOverScreen from './screens/GameOverScreen.jsx';
 import LeaderboardScreen from './screens/LeaderboardScreen.jsx';
@@ -614,7 +616,15 @@ function App() {
                 {gameState === GAME_STATES.WELCOME && <WelcomeScreen {...commonProps} />}
                 {gameState === GAME_STATES.MENU && <MenuScreen {...commonProps} />}
                 {gameState === GAME_STATES.GAME_MODES && <GameModesScreen {...commonProps} />}
-                {gameState === GAME_STATES.PLAYING && <GameScreen {...gameProps} />}
+                
+                {/* ⭐ AŽURIRANO RENDERIRANJE ZA STORY MODE */}
+                {gameState === GAME_STATES.PLAYING && gameMode === GAME_MODES.STORY && (
+                    <StoryGameScreen {...gameProps} />
+                )}
+                {gameState === GAME_STATES.PLAYING && gameMode !== GAME_MODES.STORY && (
+                    <GameScreen {...gameProps} />
+                )}
+                
                 {gameState === GAME_STATES.LEVEL_COMPLETE && <LevelCompleteScreen {...commonProps} />}
                 {gameState === GAME_STATES.GAME_OVER && <GameOverScreen {...commonProps} />}
                 {gameState === GAME_STATES.LEADERBOARD && <LeaderboardScreen {...commonProps} />}
